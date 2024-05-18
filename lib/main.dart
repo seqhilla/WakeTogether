@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:waketogether/data/AlarmItem.dart';
+import 'package:waketogether/screens/edit_alarm_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,42 +13,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'WakeTogether',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'WakeTogether'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   final String title;
 
@@ -55,71 +33,131 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
 
-  void _incrementCounter() {
+  List<AlarmItem> alarms = [
+    AlarmItem(alarmName: 'Alarm 0', alarmTime: '12:00', daysActive: [true, false, true, false, true, false, true], isActive: true),
+    // Add more alarms as needed
+  ];
+
+  void _toggleActive(int index, bool newValue) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      alarms[index].isActive = newValue;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditAlarmScreen(
+                    initialAlarmName: '',
+                    initialAlarmTime: TimeOfDay(hour: 6, minute: 0),
+                    initialDaysActive: List<bool>.filled(7, false),
+                  ),
+                ),
+              );
+              if (result != null) {
+                setState(() {
+                  // Assuming result is a Map with 'alarmName', 'alarmTime', and 'daysActive'
+                  // Update your list based on your app's logic
+                  // Add more logic here if you need to store alarm details
+                });
+              }
+            },
+          ),
+        ],
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      body: ListView.builder(
+        itemCount: alarms.length, // Updated to use the length of the alarms list
+        itemBuilder: (context, index) {
+          final alarm = alarms[index];
+          return alarmListItem(
+            alarmName: alarm.alarmName,
+            alarmTime: alarm.alarmTime,
+            daysActive: alarm.daysActive,
+            isActive: alarm.isActive,
+            onToggle: (newValue) => _toggleActive(index, newValue),
+            context: context,
+          );
+        },
+      ),
+    );
+  }
+
+  Widget alarmListItem({
+    required String alarmName,
+    required String alarmTime,
+    required List<bool> daysActive,
+    required bool isActive,
+    required Function(bool) onToggle,
+    required BuildContext context, // Ensure BuildContext is passed as a parameter
+  }) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => EditAlarmScreen(
+              initialAlarmName: alarmName,
+              initialAlarmTime: TimeOfDay.now(), // Adjust based on your needs
+              initialDaysActive: daysActive,
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+          ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isActive ? Colors.white : Colors.grey[300],
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(alarmName, style: TextStyle(fontSize: 14)),
+                Text(alarmTime, style: TextStyle(fontSize: 42)),
+              ],
+            ),
+            const Spacer(),
+            Row(
+              children: List.generate(7, (index) {
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: daysActive[index] ? Colors.green : Colors.grey,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                    Text(['P', 'S', 'Ç', 'P', 'C', 'C', 'P'][index], style: TextStyle(fontSize: 10)), // Day initials
+                  ],
+                );
+              }),
+            ),
+            const SizedBox(width: 16),
+            Switch(
+              value: isActive,
+              onChanged: onToggle,
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+
 }
