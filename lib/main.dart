@@ -9,7 +9,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -33,7 +32,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   List<AlarmItem> alarms = [
     AlarmItem(alarmName: 'Alarm 0', alarmTime: '12:00', daysActive: [true, false, true, false, true, false, true], isActive: true),
     // Add more alarms as needed
@@ -61,14 +59,28 @@ class _MyHomePageState extends State<MyHomePage> {
                     initialAlarmName: '',
                     initialAlarmTime: TimeOfDay(hour: 6, minute: 0),
                     initialDaysActive: List<bool>.filled(7, false),
+                    alarmIndex: -1, // Indicates a new alarm
                   ),
                 ),
               );
               if (result != null) {
                 setState(() {
-                  // Assuming result is a Map with 'alarmName', 'alarmTime', and 'daysActive'
-                  // Update your list based on your app's logic
-                  // Add more logic here if you need to store alarm details
+                  if (result['isNew']) {
+                    // Add a new alarm
+                    alarms.add(AlarmItem(
+                      alarmName: result['alarmName'],
+                      alarmTime: result['alarmTime'].format(context), // Convert TimeOfDay to String
+                      daysActive: result['daysActive'],
+                      isActive: true, // Assuming new alarms are active by default
+                    ));
+                  } else {
+                    // Update an existing alarm
+                    int index = result['index'];
+                    alarms[index].alarmName = result['alarmName'];
+                    alarms[index].alarmTime = result['alarmTime'].format(context); // Convert TimeOfDay to String
+                    alarms[index].daysActive = result['daysActive'];
+                    // isActive remains unchanged or can be updated based on your logic
+                  }
                 });
               }
             },
@@ -76,16 +88,20 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       body: ListView.builder(
-        itemCount: alarms.length, // Updated to use the length of the alarms list
+        itemCount: alarms.length,
         itemBuilder: (context, index) {
           final alarm = alarms[index];
-          return alarmListItem(
-            alarmName: alarm.alarmName,
-            alarmTime: alarm.alarmTime,
-            daysActive: alarm.daysActive,
-            isActive: alarm.isActive,
-            onToggle: (newValue) => _toggleActive(index, newValue),
-            context: context,
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0), // Adjust the padding as needed
+            child: alarmListItem(
+              alarmName: alarm.alarmName,
+              alarmTime: alarm.alarmTime,
+              daysActive: alarm.daysActive,
+              isActive: alarm.isActive,
+              onToggle: (newValue) => _toggleActive(index, newValue),
+              context: context,
+              index: index,
+            ),
           );
         },
       ),
@@ -98,7 +114,8 @@ class _MyHomePageState extends State<MyHomePage> {
     required List<bool> daysActive,
     required bool isActive,
     required Function(bool) onToggle,
-    required BuildContext context, // Ensure BuildContext is passed as a parameter
+    required BuildContext context,
+    required int index,
   }) {
     return GestureDetector(
       onTap: () {
@@ -106,53 +123,72 @@ class _MyHomePageState extends State<MyHomePage> {
           context,
           MaterialPageRoute(
             builder: (context) => EditAlarmScreen(
-              initialAlarmName: alarmName,
-              initialAlarmTime: TimeOfDay.now(), // Adjust based on your needs
-              initialDaysActive: daysActive,
+              initialAlarmName: alarms[index].alarmName,
+              initialAlarmTime: TimeOfDay.now(), // Convert `alarmTime` string to TimeOfDay
+              initialDaysActive: alarms[index].daysActive,
+              alarmIndex: index, // Index of the existing alarm
             ),
           ),
         );
       },
       child: Container(
+        height: 120, // Fixed height for the card
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isActive ? Colors.white : Colors.grey[300],
+          color: Colors.white,
           borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: Offset(0, 3),
+            ),
+          ],
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween, // Adjust space between elements
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(alarmName, style: TextStyle(fontSize: 14)),
-                Text(alarmTime, style: TextStyle(fontSize: 42)),
-              ],
-            ),
-            const Spacer(),
+            Text(alarmName, style: TextStyle(fontSize: 14)),
             Row(
-              children: List.generate(7, (index) {
-                return Column(
-                  children: [
-                    Padding(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween, // Align items in the row
+              children: [
+                Expanded(
+                  child: AnimatedOpacity(
+                    opacity: isActive ? 1.0 : 0.5,
+                    duration: const Duration(milliseconds: 300),
+                    child: Text(alarmTime, style: TextStyle(fontSize: 42)),
+                  ),
+                ),
+                SizedBox(width: 8), // Space before the days
+                Row(
+                  children: List.generate(7, (dayIndex) {
+                    return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 2),
-                      child: Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          color: daysActive[index] ? Colors.green : Colors.grey,
-                          shape: BoxShape.circle,
-                        ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center, // Center days vertically
+                        children: [
+                          Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: daysActive[dayIndex] ? (isActive ? Colors.deepPurple : Colors.grey) : Colors.transparent,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          Text(['P', 'S', 'Ç', 'P', 'C', 'C', 'P'][dayIndex], style: TextStyle(fontSize: 10, color: isActive ? Colors.black : Colors.grey)),
+                        ],
                       ),
-                    ),
-                    Text(['P', 'S', 'Ç', 'P', 'C', 'C', 'P'][index], style: TextStyle(fontSize: 10)), // Day initials
-                  ],
-                );
-              }),
-            ),
-            const SizedBox(width: 16),
-            Switch(
-              value: isActive,
-              onChanged: onToggle,
+                    );
+                  }),
+                ),
+                SizedBox(width: 16), // Added space between the days and the switch
+                Switch(
+                  value: isActive,
+                  onChanged: onToggle,
+                ),
+              ],
             ),
           ],
         ),

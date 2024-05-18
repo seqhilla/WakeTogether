@@ -4,12 +4,14 @@ class EditAlarmScreen extends StatefulWidget {
   final String initialAlarmName;
   final TimeOfDay initialAlarmTime;
   final List<bool> initialDaysActive;
+  final int alarmIndex;
 
   const EditAlarmScreen({
     Key? key,
     required this.initialAlarmName,
     required this.initialAlarmTime,
     required this.initialDaysActive,
+    required this.alarmIndex,
   }) : super(key: key);
 
   @override
@@ -120,17 +122,19 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
               children: [
                 ElevatedButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text('Cancel'),
+                  child: Text('İptal'),
                 ),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () { //TODO: 24 Biçiminde yapma seçeneği ekle
                     Navigator.pop(context, {
                       'alarmName': _alarmNameController.text,
                       'alarmTime': _selectedTime,
                       'daysActive': _daysActive,
+                      'isNew': widget.alarmIndex == -1, // Determine if the alarm is new
+                      'index': widget.alarmIndex, // Pass the index back
                     });
                   },
-                  child: Text('Save'),
+                  child: Text('Kaydet'),
                 ),
               ],
             ),
