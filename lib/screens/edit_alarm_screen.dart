@@ -8,12 +8,12 @@ class EditAlarmScreen extends StatefulWidget {
   final int alarmIndex;
 
   const EditAlarmScreen({
-    Key? key,
+    super.key,
     required this.initialAlarmName,
     required this.initialAlarmTime,
     required this.initialDaysActive,
     required this.alarmIndex,
-  }) : super(key: key);
+  });
 
   @override
   _EditAlarmScreenState createState() => _EditAlarmScreenState();
@@ -60,17 +60,17 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Alarm'),
+        title: const Text('Alarm'),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             ListTile(
-              title: Text('Alarm Zamanı'),
+              title: const Text('Alarm Zamanı'),
               trailing: Text(to24hFormat(_selectedTime)),
               onTap: _pickTime,
             ),
-            SizedBox(height: 20), // Added space between alarm time and day selection
+            const SizedBox(height: 20), // Added space between alarm time and day selection
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -83,7 +83,7 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                   final bool isActive = _daysActive[dayIndex];
                   final bool isWeekend = dayIndex == 5 || dayIndex == 6;
                   final Color borderColor = isActive ? Colors.lightBlue : Colors.transparent;
-                  final Color activeBackgroundColor = isActive ? Colors.lightBlue[100]! : Colors.transparent;
+                  //final Color activeBackgroundColor = isActive ? Colors.lightBlue[100]! : Colors.transparent;
                   final Color activeTextColor = isActive ? Colors.lightBlue : Colors.black;
                   final Color inactiveTextColor = isWeekend ? Colors.red : Colors.black;
 
@@ -94,12 +94,11 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                       });
                     },
                     child: AnimatedContainer(
-                      duration: Duration(milliseconds: 300),
+                      duration: const Duration(milliseconds: 200),
                       width: 30,
                       height: 30,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: activeBackgroundColor,
                         border: Border.all(color: borderColor),
                         borderRadius: BorderRadius.circular(40),
                       ),
@@ -112,21 +111,24 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                 }),
               ),
             ),
-            SizedBox(height: 20), // Added space before the TextField
+            const SizedBox(height: 20), // Added space before the TextField
             Padding(
               padding: const EdgeInsets.all(16.0), // Adjust the padding value as needed
               child: TextField(
                 controller: _alarmNameController,
-                decoration: InputDecoration(labelText: 'Alarm Name'),
+                decoration: const InputDecoration(
+                  labelText: 'Alarm Name',
+                ),
+                maxLength: 15, // Limit the input to 15 characters
               ),
             ),
-            SizedBox(height: 20), // Added space before the buttons
+            const SizedBox(height: 20), // Added space before the buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text('İptal'),
+                  child: const Text('İptal'),
                 ),
                 ElevatedButton(
                   onPressed: () { //TODO: 24 Biçiminde yapma seçeneği ekle
@@ -138,11 +140,11 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                       'index': widget.alarmIndex, // Pass the index back
                     });
                   },
-                  child: Text('Kaydet'),
+                  child: const Text('Kaydet'),
                 ),
               ],
             ),
-            SizedBox(height: 20), // Added space at the bottom for better spacing
+            const SizedBox(height: 20), // Added space at the bottom for better spacing
           ],
         ),
       ),

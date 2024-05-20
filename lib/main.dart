@@ -185,7 +185,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       if (alarmName.isNotEmpty)  AnimatedOpacity(
                         opacity: isActive ? 1.0 : 0.5,
                         duration: const Duration(milliseconds: PASSIVE_ANIMATION_DURATION),
-                        child: Text(alarmName, style: const TextStyle(fontSize: 16)),
+                        child: Text(
+                          alarmName,
+                          style: const TextStyle(fontSize: 16),
+                          maxLines: 1,
+                        ),
                       ),
                       AnimatedOpacity(
                         opacity: isActive ? 1.0 : 0.5,
@@ -208,7 +212,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             duration: const Duration(milliseconds: PASSIVE_ANIMATION_DURATION),
                             child: Container(
                               width: 10,
-                              height: 10,
+                              height: 5,
                               decoration: BoxDecoration(
                                 color: daysActive[dayIndex] ? (Colors.deepPurple) : Colors.transparent,
                                 shape: BoxShape.circle,
@@ -219,14 +223,14 @@ class _MyHomePageState extends State<MyHomePage> {
                           AnimatedOpacity(
                             opacity: isActive ? 1.0 : 0.5,
                             duration: const Duration(milliseconds: PASSIVE_ANIMATION_DURATION),
-                            child:Text(['P', 'S', 'Ç', 'P', 'C', 'C', 'P'][dayIndex], style: TextStyle(fontSize: 10)),
+                            child:Text(['P', 'S', 'Ç', 'P', 'C', 'C', 'P'][dayIndex], style: const TextStyle(fontSize: 12)),
                           ),
                         ],
                       ),
                     );
                   }),
                 ),
-                SizedBox(width: 16), // Added space between the days and the switch
+                const SizedBox(width: 16), // Added space between the days and the switch
                 Switch(
                   value: isActive,
                   onChanged: onToggle,
