@@ -69,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     // Add a new alarm
                     alarms.add(AlarmItem(
                       alarmName: result['alarmName'],
-                      alarmTime: result['alarmTime'].format(context), // Convert TimeOfDay to String
+                      alarmTime: formatTimeOfDay(result['alarmTime']), // Convert TimeOfDay to String
                       daysActive: result['daysActive'],
                       isActive: true, // Assuming new alarms are active by default
                     ));
@@ -77,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     // Update an existing alarm
                     int index = result['index'];
                     alarms[index].alarmName = result['alarmName'];
-                    alarms[index].alarmTime = result['alarmTime'].format(context); // Convert TimeOfDay to String
+                    alarms[index].alarmTime = formatTimeOfDay(result['alarmTime']); // Convert TimeOfDay to String
                     alarms[index].daysActive = result['daysActive'];
                     // isActive remains unchanged or can be updated based on your logic
                   }
@@ -106,6 +106,12 @@ class _MyHomePageState extends State<MyHomePage> {
         },
       ),
     );
+  }
+
+  String formatTimeOfDay(TimeOfDay time) {
+    final hours = time.hour.toString().padLeft(2, '0');
+    final minutes = time.minute.toString().padLeft(2, '0');
+    return '$hours:$minutes';
   }
 
   Widget alarmListItem({
@@ -142,23 +148,33 @@ class _MyHomePageState extends State<MyHomePage> {
               color: Colors.grey.withOpacity(0.5),
               spreadRadius: 1,
               blurRadius: 5,
-              offset: Offset(0, 3),
+              offset: Offset(0, 4),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween, // Adjust space between elements
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(alarmName, style: TextStyle(fontSize: 14)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween, // Align items in the row
               children: [
                 Expanded(
-                  child: AnimatedOpacity(
-                    opacity: isActive ? 1.0 : 0.5,
-                    duration: const Duration(milliseconds: 300),
-                    child: Text(alarmTime, style: TextStyle(fontSize: 42)),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start, // Aligns horizontally to the start
+                    children: [
+                      if (alarmName.isNotEmpty)  AnimatedOpacity(
+                        opacity: isActive ? 1.0 : 0.5,
+                        duration: const Duration(milliseconds: 300),
+                        child: Text(alarmName, style: const TextStyle(fontSize: 16)),
+                      ),
+                      AnimatedOpacity(
+                        opacity: isActive ? 1.0 : 0.5,
+                        duration: const Duration(milliseconds: 300),
+                        child: Text(alarmTime, style: const TextStyle(fontSize: 42)),
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(width: 8), // Space before the days
@@ -167,7 +183,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 2),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center, // Center days vertically
+                        mainAxisAlignment: MainAxisAlignment.center, // This centers the children vertically
                         children: [
                           Container(
                             width: 10,
