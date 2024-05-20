@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:waketogether/data/AlarmItem.dart';
 import 'package:waketogether/screens/edit_alarm_screen.dart';
+import 'package:waketogether/utils/TimeUtils.dart';
 
 void main() {
   runApp(const MyApp());
@@ -50,14 +51,14 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add),
             onPressed: () async {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => EditAlarmScreen(
                     initialAlarmName: '',
-                    initialAlarmTime: TimeOfDay(hour: 6, minute: 0),
+                    initialAlarmTime: const TimeOfDay(hour: 6, minute: 0),
                     initialDaysActive: List<bool>.filled(7, false),
                     alarmIndex: -1, // Indicates a new alarm
                   ),
@@ -69,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     // Add a new alarm
                     alarms.add(AlarmItem(
                       alarmName: result['alarmName'],
-                      alarmTime: formatTimeOfDay(result['alarmTime']), // Convert TimeOfDay to String
+                      alarmTime: to24hFormat(result['alarmTime']), // Convert TimeOfDay to String
                       daysActive: result['daysActive'],
                       isActive: true, // Assuming new alarms are active by default
                     ));
@@ -77,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     // Update an existing alarm
                     int index = result['index'];
                     alarms[index].alarmName = result['alarmName'];
-                    alarms[index].alarmTime = formatTimeOfDay(result['alarmTime']); // Convert TimeOfDay to String
+                    alarms[index].alarmTime = to24hFormat(result['alarmTime']); // Convert TimeOfDay to String
                     alarms[index].daysActive = result['daysActive'];
                     // isActive remains unchanged or can be updated based on your logic
                   }
@@ -108,12 +109,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  String formatTimeOfDay(TimeOfDay time) {
-    final hours = time.hour.toString().padLeft(2, '0');
-    final minutes = time.minute.toString().padLeft(2, '0');
-    return '$hours:$minutes';
-  }
-
   Widget alarmListItem({
     required String alarmName,
     required String alarmTime,
@@ -123,6 +118,8 @@ class _MyHomePageState extends State<MyHomePage> {
     required BuildContext context,
     required int index,
   }) {
+    const PASSIVE_ANIMATION_DURATION = 300;
+
     return GestureDetector(
       onTap: () async {
         final result = await Navigator.push(
@@ -130,7 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
           MaterialPageRoute(
             builder: (context) => EditAlarmScreen(
               initialAlarmName: alarms[index].alarmName,
-              initialAlarmTime: TimeOfDay.now(), // Convert `alarmTime` string to TimeOfDay
+              initialAlarmTime: toTimeOfDay(alarms[index].alarmTime),
               initialDaysActive: alarms[index].daysActive,
               alarmIndex: index, // Index of the existing alarm
             ),
@@ -142,7 +139,7 @@ class _MyHomePageState extends State<MyHomePage> {
               // Add a new alarm
               alarms.add(AlarmItem(
                 alarmName: result['alarmName'],
-                alarmTime: formatTimeOfDay(result['alarmTime']), // Convert TimeOfDay to String
+                alarmTime: to24hFormat(result['alarmTime']), // Convert TimeOfDay to String
                 daysActive: result['daysActive'],
                 isActive: true, // Assuming new alarms are active by default
               ));
@@ -150,7 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
               // Update an existing alarm
               int index = result['index'];
               alarms[index].alarmName = result['alarmName'];
-              alarms[index].alarmTime = formatTimeOfDay(result['alarmTime']); // Convert TimeOfDay to String
+              alarms[index].alarmTime = to24hFormat(result['alarmTime']); // Convert TimeOfDay to String
               alarms[index].daysActive = result['daysActive'];
               alarms[index].isActive = true;
               // isActive remains unchanged or can be updated based on your logic
@@ -187,12 +184,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                       if (alarmName.isNotEmpty)  AnimatedOpacity(
                         opacity: isActive ? 1.0 : 0.5,
-                        duration: const Duration(milliseconds: 300),
+                        duration: const Duration(milliseconds: PASSIVE_ANIMATION_DURATION),
                         child: Text(alarmName, style: const TextStyle(fontSize: 16)),
                       ),
                       AnimatedOpacity(
                         opacity: isActive ? 1.0 : 0.5,
-                        duration: const Duration(milliseconds: 300),
+                        duration: const Duration(milliseconds: PASSIVE_ANIMATION_DURATION),
                         child: Text(alarmTime, style: const TextStyle(fontSize: 42)),
                       ),
                     ],
@@ -206,15 +203,24 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center, // This centers the children vertically
                         children: [
-                          Container(
-                            width: 10,
-                            height: 10,
-                            decoration: BoxDecoration(
-                              color: daysActive[dayIndex] ? (isActive ? Colors.deepPurple : Colors.grey) : Colors.transparent,
-                              shape: BoxShape.circle,
+                          AnimatedOpacity(
+                            opacity: isActive ? 1.0 : 0.5,
+                            duration: const Duration(milliseconds: PASSIVE_ANIMATION_DURATION),
+                            child: Container(
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: daysActive[dayIndex] ? (Colors.deepPurple) : Colors.transparent,
+                                shape: BoxShape.circle,
+                              ),
                             ),
                           ),
-                          Text(['P', 'S', 'Ç', 'P', 'C', 'C', 'P'][dayIndex], style: TextStyle(fontSize: 10, color: isActive ? Colors.black : Colors.grey)),
+
+                          AnimatedOpacity(
+                            opacity: isActive ? 1.0 : 0.5,
+                            duration: const Duration(milliseconds: PASSIVE_ANIMATION_DURATION),
+                            child:Text(['P', 'S', 'Ç', 'P', 'C', 'C', 'P'][dayIndex], style: TextStyle(fontSize: 10)),
+                          ),
                         ],
                       ),
                     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:waketogether/utils/TimeUtils.dart';
 
 class EditAlarmScreen extends StatefulWidget {
   final String initialAlarmName;
@@ -59,14 +60,14 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Alarm'),
+        title: Text('Alarm'),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             ListTile(
-              title: Text('Alarm Time'),
-              trailing: Text('${_selectedTime.format(context)}'),
+              title: Text('Alarm Zamanı'),
+              trailing: Text(to24hFormat(_selectedTime)),
               onTap: _pickTime,
             ),
             SizedBox(height: 20), // Added space between alarm time and day selection
@@ -112,9 +113,12 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
               ),
             ),
             SizedBox(height: 20), // Added space before the TextField
-            TextField(
-              controller: _alarmNameController,
-              decoration: InputDecoration(labelText: 'Alarm Name'),
+            Padding(
+              padding: const EdgeInsets.all(16.0), // Adjust the padding value as needed
+              child: TextField(
+                controller: _alarmNameController,
+                decoration: InputDecoration(labelText: 'Alarm Name'),
+              ),
             ),
             SizedBox(height: 20), // Added space before the buttons
             Row(
