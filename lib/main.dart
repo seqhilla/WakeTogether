@@ -33,7 +33,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<AlarmItem> alarms = [
-    AlarmItem(alarmName: 'Alarm 0', alarmTime: '12:00', daysActive: [true, false, true, false, true, false, true], isActive: true),
+    //AlarmItem(alarmName: 'Alarm 0', alarmTime: '12:00', daysActive: [true, false, true, false, true, false, true], isActive: true),
     // Add more alarms as needed
   ];
 
@@ -124,8 +124,8 @@ class _MyHomePageState extends State<MyHomePage> {
     required int index,
   }) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
+      onTap: () async {
+        final result = await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => EditAlarmScreen(
@@ -136,6 +136,27 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         );
+        if (result != null) {
+          setState(() {
+            if (result['isNew']) {
+              // Add a new alarm
+              alarms.add(AlarmItem(
+                alarmName: result['alarmName'],
+                alarmTime: formatTimeOfDay(result['alarmTime']), // Convert TimeOfDay to String
+                daysActive: result['daysActive'],
+                isActive: true, // Assuming new alarms are active by default
+              ));
+            } else {
+              // Update an existing alarm
+              int index = result['index'];
+              alarms[index].alarmName = result['alarmName'];
+              alarms[index].alarmTime = formatTimeOfDay(result['alarmTime']); // Convert TimeOfDay to String
+              alarms[index].daysActive = result['daysActive'];
+              alarms[index].isActive = true;
+              // isActive remains unchanged or can be updated based on your logic
+            }
+          });
+        }
       },
       child: Container(
         height: 120, // Fixed height for the card
