@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:waketogether/data/AlarmItem.dart';
 import 'package:waketogether/screens/edit_alarm_screen.dart';
+import 'package:waketogether/utils/DatabaseHelper.dart';
 import 'package:waketogether/utils/TimeUtils.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -33,14 +35,32 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<AlarmItem> alarms = [
-    //AlarmItem(alarmName: 'Alarm 0', alarmTime: '12:00', daysActive: [true, false, true, false, true, false, true], isActive: true),
-    // Add more alarms as needed
-  ];
+  List<AlarmItem> alarms = [];
 
-  void _toggleActive(int index, bool newValue) {
+  @override
+  void initState() {
+    super.initState();
+    _loadAlarms();
+  }
+
+  void _loadAlarms() async {
+    final dbAlarms = await DatabaseHelper.instance.readAllAlarms();
     setState(() {
-      alarms[index].isActive = newValue;
+      alarms = dbAlarms;
+    });
+  }
+
+  void _toggleActive(int index, bool newValue) async {
+    final alarm = AlarmItem(
+      id: alarms[index].id,
+      name: alarms[index].name,
+      time: alarms[index].time,
+      daysActive:alarms[index].daysActive,
+      isActive: newValue,
+    );
+    await DatabaseHelper.instance.update(alarm);
+    setState(() {
+      alarms[index] = alarm;
     });
   }
 
@@ -56,33 +76,14 @@ class _MyHomePageState extends State<MyHomePage> {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EditAlarmScreen(
-                    initialAlarmName: '',
-                    initialAlarmTime: const TimeOfDay(hour: 6, minute: 0),
-                    initialDaysActive: List<bool>.filled(7, false),
-                    alarmIndex: -1, // Indicates a new alarm
+                  builder: (context) => const EditAlarmScreen(
+                    initialAlarm: AlarmItem(name: '', time: "06:00", daysActive: '0,0,0,0,0,0,0', isActive: true),
+                    isNew: true,
                   ),
                 ),
               );
               if (result != null) {
-                setState(() {
-                  if (result['isNew']) {
-                    // Add a new alarm
-                    alarms.add(AlarmItem(
-                      alarmName: result['alarmName'],
-                      alarmTime: to24hFormat(result['alarmTime']), // Convert TimeOfDay to String
-                      daysActive: result['daysActive'],
-                      isActive: true, // Assuming new alarms are active by default
-                    ));
-                  } else {
-                    // Update an existing alarm
-                    int index = result['index'];
-                    alarms[index].alarmName = result['alarmName'];
-                    alarms[index].alarmTime = to24hFormat(result['alarmTime']); // Convert TimeOfDay to String
-                    alarms[index].daysActive = result['daysActive'];
-                    // isActive remains unchanged or can be updated based on your logic
-                  }
-                });
+                _loadAlarms(); // Reload alarms from database
               }
             },
           ),
@@ -92,12 +93,14 @@ class _MyHomePageState extends State<MyHomePage> {
         itemCount: alarms.length,
         itemBuilder: (context, index) {
           final alarm = alarms[index];
+          print(alarm.daysActive.split(',').map((e) => e == 'true').toList());
+          print(alarm.daysActive);
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0), // Adjust the padding as needed
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
             child: alarmListItem(
-              alarmName: alarm.alarmName,
-              alarmTime: alarm.alarmTime,
-              daysActive: alarm.daysActive,
+              alarmName: alarm.name,
+              alarmTime: toTimeOfDay(alarm.time),
+              daysActive: alarm.daysActive.split(',').map((e) => e == 'true').toList(),
               isActive: alarm.isActive,
               onToggle: (newValue) => _toggleActive(index, newValue),
               context: context,
@@ -111,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget alarmListItem({
     required String alarmName,
-    required String alarmTime,
+    required TimeOfDay alarmTime,
     required List<bool> daysActive,
     required bool isActive,
     required Function(bool) onToggle,
@@ -126,37 +129,17 @@ class _MyHomePageState extends State<MyHomePage> {
           context,
           MaterialPageRoute(
             builder: (context) => EditAlarmScreen(
-              initialAlarmName: alarms[index].alarmName,
-              initialAlarmTime: toTimeOfDay(alarms[index].alarmTime),
-              initialDaysActive: alarms[index].daysActive,
-              alarmIndex: index, // Index of the existing alarm
+              initialAlarm: alarms[index],
+              isNew: false,
             ),
           ),
         );
         if (result != null) {
-          setState(() {
-            if (result['isNew']) {
-              // Add a new alarm
-              alarms.add(AlarmItem(
-                alarmName: result['alarmName'],
-                alarmTime: to24hFormat(result['alarmTime']), // Convert TimeOfDay to String
-                daysActive: result['daysActive'],
-                isActive: true, // Assuming new alarms are active by default
-              ));
-            } else {
-              // Update an existing alarm
-              int index = result['index'];
-              alarms[index].alarmName = result['alarmName'];
-              alarms[index].alarmTime = to24hFormat(result['alarmTime']); // Convert TimeOfDay to String
-              alarms[index].daysActive = result['daysActive'];
-              alarms[index].isActive = true;
-              // isActive remains unchanged or can be updated based on your logic
-            }
-          });
+          _loadAlarms(); // Reload alarms from database
         }
       },
       child: Container(
-        height: 120, // Fixed height for the card
+        height: 120,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -175,14 +158,14 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween, // Align items in the row
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start, // Aligns horizontally to the start
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (alarmName.isNotEmpty)  AnimatedOpacity(
+                      if (alarmName.isNotEmpty) AnimatedOpacity(
                         opacity: isActive ? 1.0 : 0.5,
                         duration: const Duration(milliseconds: PASSIVE_ANIMATION_DURATION),
                         child: Text(
@@ -194,18 +177,18 @@ class _MyHomePageState extends State<MyHomePage> {
                       AnimatedOpacity(
                         opacity: isActive ? 1.0 : 0.5,
                         duration: const Duration(milliseconds: PASSIVE_ANIMATION_DURATION),
-                        child: Text(alarmTime, style: const TextStyle(fontSize: 42)),
+                        child: Text(to24hFormat(alarmTime), style: const TextStyle(fontSize: 42)),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(width: 8), // Space before the days
+                SizedBox(width: 8),
                 Row(
                   children: List.generate(7, (dayIndex) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 2),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center, // This centers the children vertically
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           AnimatedOpacity(
                             opacity: isActive ? 1.0 : 0.5,
@@ -214,23 +197,22 @@ class _MyHomePageState extends State<MyHomePage> {
                               width: 10,
                               height: 5,
                               decoration: BoxDecoration(
-                                color: daysActive[dayIndex] ? (Colors.deepPurple) : Colors.transparent,
+                                color: daysActive[dayIndex] ? Colors.deepPurple : Colors.transparent,
                                 shape: BoxShape.circle,
                               ),
                             ),
                           ),
-
                           AnimatedOpacity(
                             opacity: isActive ? 1.0 : 0.5,
                             duration: const Duration(milliseconds: PASSIVE_ANIMATION_DURATION),
-                            child:Text(['P', 'S', 'Ç', 'P', 'C', 'C', 'P'][dayIndex], style: const TextStyle(fontSize: 12)),
+                            child: Text(['P', 'S', 'Ç', 'P', 'C', 'C', 'P'][dayIndex], style: const TextStyle(fontSize: 12)),
                           ),
                         ],
                       ),
                     );
                   }),
                 ),
-                const SizedBox(width: 16), // Added space between the days and the switch
+                const SizedBox(width: 16),
                 Switch(
                   value: isActive,
                   onChanged: onToggle,
@@ -242,5 +224,4 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-
 }

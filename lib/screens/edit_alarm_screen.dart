@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:waketogether/data/AlarmItem.dart';
+import 'package:waketogether/utils/DatabaseHelper.dart';
 import 'package:waketogether/utils/TimeUtils.dart';
 
 class EditAlarmScreen extends StatefulWidget {
-  final String initialAlarmName;
-  final TimeOfDay initialAlarmTime;
-  final List<bool> initialDaysActive;
-  final int alarmIndex;
+  final AlarmItem initialAlarm;
+  final bool isNew;
 
   const EditAlarmScreen({
     super.key,
-    required this.initialAlarmName,
-    required this.initialAlarmTime,
-    required this.initialDaysActive,
-    required this.alarmIndex,
+    required this.initialAlarm,
+    required this.isNew,
   });
 
   @override
@@ -27,9 +25,9 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
   @override
   void initState() {
     super.initState();
-    _alarmNameController = TextEditingController(text: widget.initialAlarmName);
-    _selectedTime = widget.initialAlarmTime;
-    _daysActive = List.from(widget.initialDaysActive);
+    _alarmNameController = TextEditingController(text: widget.initialAlarm.name);
+    _selectedTime = toTimeOfDay(widget.initialAlarm.time);
+    _daysActive = widget.initialAlarm.daysActive.split(',').map((e) => e == 'true').toList();
   }
 
   @override
@@ -131,14 +129,17 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                   child: const Text('İptal'),
                 ),
                 ElevatedButton(
-                  onPressed: () { //TODO: 24 Biçiminde yapma seçeneği ekle
-                    Navigator.pop(context, {
-                      'alarmName': _alarmNameController.text,
-                      'alarmTime': _selectedTime,
-                      'daysActive': _daysActive,
-                      'isNew': widget.alarmIndex == -1, // Determine if the alarm is new
-                      'index': widget.alarmIndex, // Pass the index back
-                    });
+                  onPressed: () {
+                    //save the alarm
+                    final alarm = AlarmItem(
+                      id: widget.initialAlarm.id,
+                      name: _alarmNameController.text,
+                      time: to24hFormat(_selectedTime),
+                      daysActive: _daysActive.join(','),
+                      isActive: widget.initialAlarm.isActive,
+                    );
+                    saveOrUpdateTheAlarm(alarm);
+                    Navigator.pop(context, true);
                   },
                   child: const Text('Kaydet'),
                 ),
@@ -150,4 +151,13 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
       ),
     );
   }
+
+  void saveOrUpdateTheAlarm(AlarmItem alarm) async {
+    if (widget.isNew) {
+      await DatabaseHelper.instance.create(alarm);
+    } else {
+      await DatabaseHelper.instance.update(alarm);
+    }
+  }
+
 }
