@@ -84,6 +84,13 @@ CREATE TABLE $tableAlarms (
     );
   }
 
+  Future<int> deleteAll() async {
+    final db = await instance.database;
+    return await db.delete(
+      tableAlarms,
+    );
+  }
+
   Future close() async {
     final db = await instance.database;
     db.close();

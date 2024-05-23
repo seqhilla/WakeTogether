@@ -46,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _loadAlarms() async {
     final dbAlarms = await DatabaseHelper.instance.readAllAlarms();
     setState(() {
-      alarms = dbAlarms;
+      alarms = dbAlarms.reversed.toList();
     });
   }
 
@@ -93,8 +93,6 @@ class _MyHomePageState extends State<MyHomePage> {
         itemCount: alarms.length,
         itemBuilder: (context, index) {
           final alarm = alarms[index];
-          print(alarm.daysActive.split(',').map((e) => e == 'true').toList());
-          print(alarm.daysActive);
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
             child: alarmListItem(
