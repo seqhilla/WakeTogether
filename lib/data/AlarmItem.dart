@@ -57,4 +57,5 @@ class AlarmItem {
     AlarmFields.daysActive: daysActive,
     AlarmFields.isActive: isActive ? 1 : 0,
   };
+
 }

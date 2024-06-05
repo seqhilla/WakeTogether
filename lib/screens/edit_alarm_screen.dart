@@ -3,6 +3,8 @@ import 'package:waketogether/data/AlarmItem.dart';
 import 'package:waketogether/utils/DatabaseHelper.dart';
 import 'package:waketogether/utils/TimeUtils.dart';
 
+import '../utils/GeneralUtils.dart';
+
 class EditAlarmScreen extends StatefulWidget {
   final AlarmItem initialAlarm;
   final bool isNew;
@@ -136,9 +138,10 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                       name: _alarmNameController.text,
                       time: to24hFormat(_selectedTime),
                       daysActive: _daysActive.join(','),
-                      isActive: widget.initialAlarm.isActive,
+                      isActive: true,
                     );
                     saveOrUpdateTheAlarm(alarm);
+                    showClosestAlarmToastMessage(alarm);
                     Navigator.pop(context, true);
                   },
                   child: const Text('Kaydet'),

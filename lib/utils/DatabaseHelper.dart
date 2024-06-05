@@ -5,6 +5,7 @@ import 'package:waketogether/data/AlarmItem.dart'; // Import your AlarmItem mode
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
+
   DatabaseHelper._init();
 
   Future<Database> get database async {

@@ -1,11 +1,20 @@
+import 'dart:async';
+
+import 'package:alarm/alarm.dart';
+import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:waketogether/data/AlarmItem.dart';
+import 'package:waketogether/screens/alarm_ring.dart';
 import 'package:waketogether/screens/edit_alarm_screen.dart';
 import 'package:waketogether/utils/DatabaseHelper.dart';
+import 'package:waketogether/utils/GeneralUtils.dart';
 import 'package:waketogether/utils/TimeUtils.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Alarm.init();
+
   runApp(const MyApp());
 }
 
@@ -37,10 +46,13 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   List<AlarmItem> alarms = [];
 
+  static StreamSubscription<AlarmSettings>? subscription;
+
   @override
   void initState() {
     super.initState();
     _loadAlarms();
+    subscription ??= Alarm.ringStream.stream.listen(navigateToRingScreen);
   }
 
   void _loadAlarms() async {
@@ -48,6 +60,21 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       alarms = dbAlarms.reversed.toList();
     });
+
+    for(var alarm in alarms) {
+      if (alarm.isActive) {
+        _scheduleAlarm(alarm, false);
+      } else {
+        _cancelAlarm(alarm.id!);
+      }
+    }
+
+  }
+
+  @override
+  void dispose() {
+    subscription?.cancel();
+    super.dispose();
   }
 
   void _toggleActive(int index, bool newValue) async {
@@ -58,10 +85,56 @@ class _MyHomePageState extends State<MyHomePage> {
       daysActive:alarms[index].daysActive,
       isActive: newValue,
     );
+
     await DatabaseHelper.instance.update(alarm);
     setState(() {
       alarms[index] = alarm;
     });
+
+    if (newValue) {
+      _scheduleAlarm(alarm, true);
+    } else {
+      _cancelAlarm(alarm.id!);
+    }
+
+  }
+
+  Future<void> _scheduleAlarm(AlarmItem alarm, bool isFromToggle) async {
+    final alarmDateTimeToSet = getClosestDateTimeInAlarm(alarm);
+
+    final alarmSettings = AlarmSettings(
+      id: alarm.id!,
+      dateTime: alarmDateTimeToSet!,
+      assetAudioPath: 'assets/alarm.mp3',
+      loopAudio: true,
+      vibrate: true,
+      volume: 0.8,
+      fadeDuration: 3.0,
+      notificationTitle: alarm.name,
+      notificationBody: 'This is the body',
+      enableNotificationOnKill: true,
+    );
+
+    if(isFromToggle) {
+      showClosestAlarmToastMessage(alarm);
+    }
+
+    await Alarm.set(alarmSettings: alarmSettings);
+  }
+
+  void _cancelAlarm(int alarmId) async {
+    await Alarm.stop(alarmId);
+  }
+
+  Future<void> navigateToRingScreen(AlarmSettings alarmSettings) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (context) =>
+            ExampleAlarmRingScreen(alarmSettings: alarmSettings),
+      ),
+    );
+    _loadAlarms();
   }
 
   @override
