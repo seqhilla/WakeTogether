@@ -36,6 +36,7 @@ dependencies:
   fluttertoast: any
   permission_handler: ^11.3.1
   auto_start_flutter: ^0.1.1
+  time_picker_spinner: any
 
 
   # The following adds the Cupertino Icons font to your application.

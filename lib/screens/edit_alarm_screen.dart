@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:waketogether/data/AlarmItem.dart';
 import 'package:waketogether/utils/DatabaseHelper.dart';
 import 'package:waketogether/utils/TimeUtils.dart';
+import 'package:time_picker_spinner/time_picker_spinner.dart';
 
 import '../utils/GeneralUtils.dart';
 
@@ -27,9 +28,13 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
   @override
   void initState() {
     super.initState();
-    _alarmNameController = TextEditingController(text: widget.initialAlarm.name);
+    _alarmNameController =
+        TextEditingController(text: widget.initialAlarm.name);
     _selectedTime = toTimeOfDay(widget.initialAlarm.time);
-    _daysActive = widget.initialAlarm.daysActive.split(',').map((e) => e == 'true').toList();
+    _daysActive = widget.initialAlarm.daysActive
+        .split(',')
+        .map((e) => e == 'true')
+        .toList();
   }
 
   @override
@@ -38,6 +43,7 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
     super.dispose();
   }
 
+  /*
   void _pickTime() async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
@@ -55,22 +61,38 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
       });
     }
   }
+  */
+  void _pickTime() async {}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Alarm'),
-      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            ListTile(
-              title: const Text('Alarm Zamanı'),
-              trailing: Text(to24hFormat(_selectedTime)),
-              onTap: _pickTime,
+            const SizedBox(height: 30),
+            TimePickerSpinner(
+              locale: const Locale('en', ''),
+              time: toDateTimeFromTimeOfDay(_selectedTime),
+              is24HourMode: true,
+              isShowSeconds: false,
+              itemHeight: 60,
+              itemWidth: 100,
+              alignment: Alignment.center,
+              normalTextStyle: const TextStyle(
+                fontSize: 48,
+              ),
+              highlightedTextStyle:
+                  const TextStyle(fontSize: 48, color: Colors.blue),
+              isForce2Digits: true,
+              onTimeChange: (time) {
+                setState(() {
+                  _selectedTime = toTimeOfDayFromDateTime(time);
+                });
+              },
             ),
-            const SizedBox(height: 20), // Added space between alarm time and day selection
+            const SizedBox(height: 20),
+            // Added space between alarm time and day selection
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -82,10 +104,13 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                   int dayIndex = index ~/ 2;
                   final bool isActive = _daysActive[dayIndex];
                   final bool isWeekend = dayIndex == 5 || dayIndex == 6;
-                  final Color borderColor = isActive ? Colors.lightBlue : Colors.transparent;
+                  final Color borderColor =
+                      isActive ? Colors.lightBlue : Colors.transparent;
                   //final Color activeBackgroundColor = isActive ? Colors.lightBlue[100]! : Colors.transparent;
-                  final Color activeTextColor = isActive ? Colors.lightBlue : Colors.black;
-                  final Color inactiveTextColor = isWeekend ? Colors.red : Colors.black;
+                  final Color activeTextColor =
+                      isActive ? Colors.lightBlue : Colors.black;
+                  final Color inactiveTextColor =
+                      isWeekend ? Colors.red : Colors.black;
 
                   return GestureDetector(
                     onTap: () {
@@ -104,25 +129,30 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                       ),
                       child: Text(
                         ['P', 'S', 'Ç', 'P', 'C', 'C', 'P'][dayIndex],
-                        style: TextStyle(color: isActive ? activeTextColor : inactiveTextColor),
+                        style: TextStyle(
+                            color:
+                                isActive ? activeTextColor : inactiveTextColor),
                       ),
                     ),
                   );
                 }),
               ),
             ),
-            const SizedBox(height: 20), // Added space before the TextField
+            const SizedBox(height: 20),
+            // Added space before the TextField
             Padding(
-              padding: const EdgeInsets.all(16.0), // Adjust the padding value as needed
+              padding: const EdgeInsets.all(16.0),
+              // Adjust the padding value as needed
               child: TextField(
                 controller: _alarmNameController,
                 decoration: const InputDecoration(
-                  labelText: 'Alarm Name',
+                  labelText: 'Alarm Adı',
                 ),
                 maxLength: 15, // Limit the input to 15 characters
               ),
             ),
-            const SizedBox(height: 20), // Added space before the buttons
+            const SizedBox(height: 20),
+            // Added space before the buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -148,7 +178,7 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 20), // Added space at the bottom for better spacing
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -162,5 +192,4 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
       await DatabaseHelper.instance.update(alarm);
     }
   }
-
 }

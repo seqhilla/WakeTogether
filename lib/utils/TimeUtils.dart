@@ -132,5 +132,18 @@ String getHowManyTimeFromNow(DateTime dateTime) {
   }
 }
 
+toDateTimeFromTimeOfDay(TimeOfDay time) {
+  return DateTime(0, 0, 0, time.hour, time.minute);
+}
+
+toDateTimeFromString(String time) {
+  final now = DateTime.now();
+  final parts = time.split(':');
+  return DateTime(now.year, now.month, now.day, int.parse(parts[0]), int.parse(parts[1]));
+}
+
+toTimeOfDayFromDateTime(DateTime time) {
+  return TimeOfDay(hour: time.hour, minute: time.minute);
+}
 
 

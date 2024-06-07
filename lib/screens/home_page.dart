@@ -37,19 +37,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> checkAndRequestPermissions() async {
-    // Define the permissions to check and request
     List<Permission> permissions = [
       Permission.ignoreBatteryOptimizations,
       Permission.scheduleExactAlarm,
       Permission.notification
     ];
 
-    // Check the status of each permission
     for (var permission in permissions) {
       var status = await permission.status;
       print('$permission permission: $status.');
 
-      // If the permission is not granted, request it
       if (status.isDenied || status.isPermanentlyDenied) {
         print('Requesting $permission permission...');
         var res = await permission.request();
