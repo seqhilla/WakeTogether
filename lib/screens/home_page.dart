@@ -1,0 +1,177 @@
+import 'dart:async';
+
+import 'package:alarm/alarm.dart';
+import 'package:alarm/model/alarm_settings.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+import '../data/AlarmItem.dart';
+import '../main.dart';
+import '../utils/DatabaseHelper.dart';
+import '../utils/GeneralUtils.dart';
+import '../utils/TimeUtils.dart';
+import '../widgets/alarm_card.dart';
+import 'alarm_ring.dart';
+import 'edit_alarm_screen.dart';
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  List<AlarmItem> alarms = [];
+
+  static StreamSubscription<AlarmSettings>? subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAlarms();
+    subscription ??= Alarm.ringStream.stream.listen(navigateToRingScreen);
+    checkAndroidScheduleExactAlarmPermission();
+  }
+
+  Future<void> checkAndroidScheduleExactAlarmPermission() async {
+    final status = await Permission.scheduleExactAlarm.status;
+    print('Schedule exact alarm permission: $status.');
+    if (status.isDenied) {
+      print('Requesting schedule exact alarm permission...');
+      final res = await Permission.scheduleExactAlarm.request();
+      print('Schedule exact alarm permission ${res.isGranted
+          ? ''
+          : 'not'} granted.');
+    }
+  }
+
+  void _loadAlarms() async {
+    final dbAlarms = await DatabaseHelper.instance.readAllAlarms();
+    setState(() {
+      alarms = dbAlarms.reversed.toList();
+    });
+    for (var alarm in alarms) {
+      if (alarm.isActive) {
+        _scheduleAlarm(alarm, false);
+      } else {
+        _cancelAlarm(alarm.id!);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    subscription?.cancel();
+    super.dispose();
+  }
+
+  void _toggleActive(int index, bool newValue) async {
+    final alarm = AlarmItem(
+      id: alarms[index].id,
+      name: alarms[index].name,
+      time: alarms[index].time,
+      daysActive: alarms[index].daysActive,
+      isActive: newValue,
+    );
+
+    await DatabaseHelper.instance.update(alarm);
+    setState(() {
+      alarms[index] = alarm;
+    });
+
+    if (newValue) {
+      _scheduleAlarm(alarm, true);
+    } else {
+      _cancelAlarm(alarm.id!);
+    }
+  }
+
+  Future<void> _scheduleAlarm(AlarmItem alarm, bool isFromToggle) async {
+    final alarmDateTimeToSet = getClosestDateTimeInAlarm(alarm);
+
+    final alarmSettings = AlarmSettings(
+      id: alarm.id!,
+      dateTime: alarmDateTimeToSet,
+      assetAudioPath: 'assets/alarm.mp3',
+      loopAudio: true,
+      vibrate: true,
+      volume: 0.8,
+      fadeDuration: 3.0,
+      notificationTitle: alarm.name,
+      notificationBody: 'This is the body',
+      enableNotificationOnKill: true,
+    );
+
+    if (isFromToggle) {
+      showClosestAlarmToastMessage(alarm);
+    }
+
+    await Alarm.set(alarmSettings: alarmSettings);
+  }
+
+  void _cancelAlarm(int alarmId) async {
+    await Alarm.stop(alarmId);
+  }
+
+  Future<void> navigateToRingScreen(AlarmSettings alarmSettings) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (context) =>
+            ExampleAlarmRingScreen(alarmSettings: alarmSettings),
+      ),
+    );
+    _loadAlarms();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                  const EditAlarmScreen(
+                    initialAlarm: AlarmItem(name: '',
+                        time: "06:00",
+                        daysActive: '0,0,0,0,0,0,0',
+                        isActive: true),
+                    isNew: true,
+                  ),
+                ),
+              );
+              if (result != null) {
+                _loadAlarms(); // Reload alarms from database
+              }
+            },
+          ),
+        ],
+      ),
+      body: ListView.builder(
+        itemCount: alarms.length,
+        itemBuilder: (context, index) {
+          final alarm = alarms[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+            child: alarmListItem(
+              onToggle: (newValue) => _toggleActive(index, newValue),
+              context: context,
+              alarmItem: alarm,
+              onClickCallBack: _loadAlarms,
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

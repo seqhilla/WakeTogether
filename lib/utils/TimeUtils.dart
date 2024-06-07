@@ -14,7 +14,6 @@ TimeOfDay toTimeOfDay(String time) {
 }
 
 DateTime? getClosestActiveAlarmDateTime(List<DateTime> dateTimeList) {
-  //Bu fonksiyonda şimdi ile kıyasla en yakın olan dateTime'ı döndür
   final now = DateTime.now();
   DateTime? dateTimeToReturn;
   for(var time in dateTimeList) {
@@ -123,7 +122,7 @@ String getHowManyTimeFromNow(DateTime dateTime) {
   final difference = dateTime.difference(now);
 
  if (difference.inSeconds < 60) {
-    return '1 dakika sonraya ayarlandı';
+    return 'Alarm 1 dakika sonraya ayarlandı';
   } else if (difference.inMinutes < 60) {
     return 'Alarm ${difference.inMinutes} dakika sonrasına ayarlandı';
   } else if (difference.inHours < 24) {
