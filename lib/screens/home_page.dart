@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../data/AlarmItem.dart';
-import '../main.dart';
 import '../utils/DatabaseHelper.dart';
 import '../utils/GeneralUtils.dart';
 import '../utils/TimeUtils.dart';
