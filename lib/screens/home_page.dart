@@ -33,18 +33,28 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _loadAlarms();
     subscription ??= Alarm.ringStream.stream.listen(navigateToRingScreen);
-    checkAndroidScheduleExactAlarmPermission();
+    checkAndRequestPermissions();
   }
 
-  Future<void> checkAndroidScheduleExactAlarmPermission() async {
-    final status = await Permission.scheduleExactAlarm.status;
-    print('Schedule exact alarm permission: $status.');
-    if (status.isDenied) {
-      print('Requesting schedule exact alarm permission...');
-      final res = await Permission.scheduleExactAlarm.request();
-      print('Schedule exact alarm permission ${res.isGranted
-          ? ''
-          : 'not'} granted.');
+  Future<void> checkAndRequestPermissions() async {
+    // Define the permissions to check and request
+    List<Permission> permissions = [
+      Permission.ignoreBatteryOptimizations,
+      Permission.scheduleExactAlarm,
+      Permission.notification
+    ];
+
+    // Check the status of each permission
+    for (var permission in permissions) {
+      var status = await permission.status;
+      print('$permission permission: $status.');
+
+      // If the permission is not granted, request it
+      if (status.isDenied || status.isPermanentlyDenied) {
+        print('Requesting $permission permission...');
+        var res = await permission.request();
+        print('$permission permission ${res.isGranted ? '' : 'not'} granted.');
+      }
     }
   }
 
