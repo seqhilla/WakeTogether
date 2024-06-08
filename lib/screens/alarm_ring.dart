@@ -44,7 +44,6 @@ class ExampleAlarmRingScreen extends StatelessWidget {
                 ),
                 RawMaterialButton(
                   onPressed: () {
-                    print("Su alarm durduruldu: ${alarmSettings.id}");
                     Alarm.stop(alarmSettings.id)
                         .then((_) => Navigator.pop(context));
                   },

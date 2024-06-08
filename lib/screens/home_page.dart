@@ -45,8 +45,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
     for (var permission in permissions) {
       var status = await permission.status;
-      print('$permission permission: $status.');
-
       if (status.isDenied || status.isPermanentlyDenied) {
         print('Requesting $permission permission...');
         var res = await permission.request();
@@ -82,6 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
       time: alarms[index].time,
       daysActive: alarms[index].daysActive,
       isActive: newValue,
+      isSingleAlarm: alarms[index].isSingleAlarm
     );
 
     await DatabaseHelper.instance.update(alarm);
@@ -151,7 +150,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     initialAlarm: AlarmItem(name: '',
                         time: "06:00",
                         daysActive: '0,0,0,0,0,0,0',
-                        isActive: true),
+                        isActive: true,
+                        isSingleAlarm: true),
                     isNew: true,
                   ),
                 ),

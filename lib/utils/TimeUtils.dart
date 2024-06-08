@@ -13,20 +13,24 @@ TimeOfDay toTimeOfDay(String time) {
   return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
 }
 
-DateTime? getClosestActiveAlarmDateTime(List<DateTime> dateTimeList) {
+DateTime getClosestActiveAlarmDateTime(List<DateTime> dateTimeList) {
   final now = DateTime.now();
   DateTime? dateTimeToReturn;
-  for(var time in dateTimeList) {
-    if (dateTimeToReturn == null) {
-      dateTimeToReturn = time;
-    } else {
-      if (time.difference(now).inSeconds < dateTimeToReturn.difference(now).inSeconds) {
+  if (dateTimeList.length == 1) {
+    dateTimeToReturn = dateTimeList[0];
+  } else {
+    for(var time in dateTimeList) {
+      if (dateTimeToReturn == null) {
         dateTimeToReturn = time;
+      } else {
+        if (time.difference(now).inSeconds < dateTimeToReturn.difference(now).inSeconds) {
+          dateTimeToReturn = time;
+        }
       }
     }
   }
 
-  return dateTimeToReturn;
+  return dateTimeToReturn!;
 }
 
 List<DateTime> getActivaAlarmDateList(AlarmItem alarm) {
@@ -35,33 +39,40 @@ List<DateTime> getActivaAlarmDateList(AlarmItem alarm) {
   final now = DateTime.now();
   List<DateTime> realAlarmDateTime = [];
 
-  for (var i = 0; i < daysActive.length; i++) {
-    if (daysActive[i] == true) {
-
-      int currentDayOfWeek = now.weekday - 1;
-      //TODO: Fix next month and next year issue
-      if (i >= currentDayOfWeek) {
-        DateTime alarmDateTime = DateTime(now.year, now.month, now.day + (i - currentDayOfWeek), time.hour, time.minute);
-        if (alarmDateTime.microsecondsSinceEpoch > now.microsecondsSinceEpoch) {
-          realAlarmDateTime.add(alarmDateTime);
-        } else {
+  if (alarm.isSingleAlarm == true) {
+    DateTime fakeAlarmDate = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    if (fakeAlarmDate.microsecondsSinceEpoch < now.microsecondsSinceEpoch) {
+      DateTime alarmDateTime = DateTime(now.year, now.month, now.day + 1, time.hour, time.minute);
+      realAlarmDateTime.add(alarmDateTime);
+    } else {
+      realAlarmDateTime.add(fakeAlarmDate);
+    }
+  } else {
+    for (var i = 0; i < daysActive.length; i++) {
+      if (daysActive[i] == true) {
+        int currentDayOfWeek = now.weekday - 1;
+        //TODO: Fix next month and next year issue
+        if (i >= currentDayOfWeek) {
+          DateTime alarmDateTime = DateTime(now.year, now.month, now.day + (i - currentDayOfWeek), time.hour, time.minute);
+          if (alarmDateTime.microsecondsSinceEpoch > now.microsecondsSinceEpoch) {
+            realAlarmDateTime.add(alarmDateTime);
+          } else {
+            DateTime alarmDateTime = DateTime(now.year, now.month, now.day + (7 - currentDayOfWeek + i), time.hour, time.minute);
+            realAlarmDateTime.add(alarmDateTime);
+          }
+        } else { //TODO: check maybe Not usefull at all
           DateTime alarmDateTime = DateTime(now.year, now.month, now.day + (7 - currentDayOfWeek + i), time.hour, time.minute);
           realAlarmDateTime.add(alarmDateTime);
         }
-      } else { //TODO: check maybe Not usefull at all
-        DateTime alarmDateTime = DateTime(now.year, now.month, now.day + (7 - currentDayOfWeek + i), time.hour, time.minute);
-        realAlarmDateTime.add(alarmDateTime);
       }
     }
   }
-
   return realAlarmDateTime;
 }
 
 DateTime getClosestDateTimeInAlarm(AlarmItem alarm) {
   List<DateTime> realAlarmDateTime = getActivaAlarmDateList(alarm);
-
-  return getClosestActiveAlarmDateTime(realAlarmDateTime)!;
+  return getClosestActiveAlarmDateTime(realAlarmDateTime);
 }
 
 String getDayName(int day) {

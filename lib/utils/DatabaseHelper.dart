@@ -32,7 +32,8 @@ CREATE TABLE $tableAlarms (
   ${AlarmFields.name} $textType,
   ${AlarmFields.time} $textType,
   ${AlarmFields.daysActive} $textType,
-  ${AlarmFields.isActive} $boolType
+  ${AlarmFields.isActive} $boolType,
+  ${AlarmFields.isSingleAlarm} $boolType
 )
 ''');
   }

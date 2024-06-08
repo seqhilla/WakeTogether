@@ -160,15 +160,33 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                   onPressed: () => Navigator.pop(context),
                   child: const Text('İptal'),
                 ),
+                //Sil butonu ekle
+                ElevatedButton(
+                  onPressed: () async {
+                    if (widget.initialAlarm.id != null) {
+                      await DatabaseHelper.instance.delete(widget.initialAlarm.id!);
+                    }
+                    Navigator.pop(context, true);
+                  },
+                  child: const Text('Sil'),
+                ),
+
                 ElevatedButton(
                   onPressed: () {
-                    //save the alarm
+                    bool isAlarmSingle = true;
+                    for (int i = 0; i < _daysActive.length; i++) {
+                      if (_daysActive[i]) {
+                        isAlarmSingle = false;
+                        break;
+                      }
+                    }
                     final alarm = AlarmItem(
                       id: widget.initialAlarm.id,
                       name: _alarmNameController.text,
                       time: to24hFormat(_selectedTime),
-                      daysActive: _daysActive.join(','),
+                      daysActive: _daysActive.isEmpty ? "" : _daysActive.join(','),
                       isActive: true,
+                      isSingleAlarm: isAlarmSingle
                     );
                     saveOrUpdateTheAlarm(alarm);
                     showClosestAlarmToastMessage(alarm);
