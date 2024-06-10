@@ -129,7 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
         context,
         MaterialPageRoute<void>(
           builder: (context) =>
-              ExampleAlarmRingScreen(alarmSettings: alarmSettings, alarmItem: alarmItem),
+              AlarmRingScreen(alarmSettings: alarmSettings, alarmItem: alarmItem),
         ),
       );
       _loadAlarms();

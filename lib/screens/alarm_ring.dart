@@ -5,11 +5,11 @@ import 'package:waketogether/data/AlarmItem.dart';
 import '../widgets/AlarmCancelButtonWidget.dart';
 import '../widgets/ClockWidget.dart';
 
-class ExampleAlarmRingScreen extends StatelessWidget {
+class AlarmRingScreen extends StatelessWidget {
   final AlarmSettings alarmSettings;
   final AlarmItem alarmItem;
 
-  const ExampleAlarmRingScreen({
+  const AlarmRingScreen({
     required this.alarmSettings,
     required this.alarmItem,
     super.key,
