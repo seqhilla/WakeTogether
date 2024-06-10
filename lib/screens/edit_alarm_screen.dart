@@ -43,27 +43,6 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
     super.dispose();
   }
 
-  /*
-  void _pickTime() async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: _selectedTime,
-      builder: (BuildContext context, Widget? child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null && picked != _selectedTime) {
-      setState(() {
-        _selectedTime = picked;
-      });
-    }
-  }
-  */
-  void _pickTime() async {}
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

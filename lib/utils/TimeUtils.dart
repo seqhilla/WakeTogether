@@ -160,7 +160,15 @@ String getHowManyTimeFromNow(DateTime dateTime) {
   } else if (difference.inHours < 24) {
     return 'Alarm ${difference.inHours} saat ve ${difference.inMinutes % 60} dakika sonrasına ayarlandı';
   } else {
-    return 'Alarm, ${dateTime.hour}:${dateTime.minute} saati, ${getDayName(dateTime.weekday)}, ${dateTime.day} ${getMonthName(dateTime.month)} tarihine ayarlandı';
+    return 'Alarm, ${normalizeTime(dateTime.hour)}:${normalizeTime(dateTime.minute)} saati, ${getDayName(dateTime.weekday)}, ${normalizeTime(dateTime.day)} ${getMonthName(dateTime.month)} tarihine ayarlandı';
+  }
+}
+
+String normalizeTime(int time) {
+  if (time < 10) {
+    return "0$time";
+  } else {
+    return time.toString();
   }
 }
 
