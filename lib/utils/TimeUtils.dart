@@ -96,6 +96,27 @@ String getDayName(int day) {
   }
 }
 
+String getShortDayName(int day) {
+  switch (day) {
+    case 1:
+      return 'Pzt';
+    case 2:
+      return 'Sal';
+    case 3:
+      return 'Çar';
+    case 4:
+      return 'Per';
+    case 5:
+      return 'Cum';
+    case 6:
+      return 'Cts';
+    case 7:
+      return 'Paz';
+    default:
+      return '';
+  }
+}
+
 String getMonthName(int month) {
   switch (month) {
     case 1:
@@ -133,7 +154,7 @@ String getHowManyTimeFromNow(DateTime dateTime) {
   final difference = dateTime.difference(now);
 
  if (difference.inSeconds < 60) {
-    return 'Alarm 1 dakika sonraya ayarlandı';
+    return 'Alarm şu andan itibaren 1 dakika sonraya ayarlandı';
   } else if (difference.inMinutes < 60) {
     return 'Alarm ${difference.inMinutes} dakika sonrasına ayarlandı';
   } else if (difference.inHours < 24) {
@@ -155,6 +176,10 @@ toDateTimeFromString(String time) {
 
 toTimeOfDayFromDateTime(DateTime time) {
   return TimeOfDay(hour: time.hour, minute: time.minute);
+}
+
+String getDayMonth(DateTime dateTime) {
+  return '${getShortDayName(dateTime.weekday)}, ${dateTime.day} ${getMonthName(dateTime.month)}';
 }
 
 
