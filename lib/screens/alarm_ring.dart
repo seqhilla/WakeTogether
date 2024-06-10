@@ -1,54 +1,71 @@
 import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
+import 'package:waketogether/data/AlarmItem.dart';
+import '../widgets/AlarmCancelButtonWidget.dart';
+import '../widgets/ClockWidget.dart';
 
 class ExampleAlarmRingScreen extends StatelessWidget {
-  const ExampleAlarmRingScreen({required this.alarmSettings, super.key});
-
   final AlarmSettings alarmSettings;
+  final AlarmItem alarmItem;
+
+  const ExampleAlarmRingScreen({
+    required this.alarmSettings,
+    required this.alarmItem,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Text(
-              'You alarm (${alarmSettings.id}) is ringing...',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const Text('🔔', style: TextStyle(fontSize: 50)),
+            SizedBox(height: 40),
+            ClockWidget(key: UniqueKey(), alarmText: alarmItem.name),
+            SizedBox(height: 80),
+            SizedBox(height: 300, width: 300, child: PullAwayCancelWidget(onCancel: () {
+              Alarm.stop(alarmSettings.id)
+                .then((_) => Navigator.pop(context));
+              },),),
+            Text("Şu kadar ertele:", style: Theme.of(context).textTheme.titleLarge),
+            SizedBox(height: 20),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 RawMaterialButton(
                   onPressed: () {
-                    final now = DateTime.now();
-                    Alarm.set(
-                      alarmSettings: alarmSettings.copyWith(
-                        dateTime: DateTime(
-                          now.year,
-                          now.month,
-                          now.day,
-                          now.hour,
-                          now.minute,
-                        ).add(const Duration(minutes: 1)),
-                      ),
-                    ).then((_) => Navigator.pop(context));
+                    onSnoozePressed(context, 5);
                   },
                   child: Text(
-                    'Snooze',
+                    '5 Dk',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
                 RawMaterialButton(
                   onPressed: () {
-                    Alarm.stop(alarmSettings.id)
-                        .then((_) => Navigator.pop(context));
+                    onSnoozePressed(context, 10);
                   },
                   child: Text(
-                    'Stop',
+                    '10 Dk',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ),
+                RawMaterialButton(
+                  onPressed: () {
+                    onSnoozePressed(context, 15);
+                  },
+                  child: Text(
+                    '15 Dk',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ),
+                RawMaterialButton(
+                  onPressed: () {
+                    onSnoozePressed(context, 30);
+                  },
+                  child: Text(
+                    '30 Dk',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
@@ -58,5 +75,20 @@ class ExampleAlarmRingScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void onSnoozePressed(BuildContext context, int minuteToDelay) {
+    final now = DateTime.now();
+    Alarm.set(
+      alarmSettings: alarmSettings.copyWith(
+        dateTime: DateTime(
+          now.year,
+          now.month,
+          now.day,
+          now.hour,
+          now.minute,
+        ).add(Duration(minutes: minuteToDelay)),
+      ),
+    ).then((_) => Navigator.pop(context));
   }
 }

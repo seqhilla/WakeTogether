@@ -1,6 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:waketogether/data/AlarmItem.dart'; // Import your AlarmItem model
+import 'package:waketogether/data/AlarmItem.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -97,4 +97,19 @@ CREATE TABLE $tableAlarms (
     final db = await instance.database;
     db.close();
   }
+
+  Future<AlarmItem?> findAlarmItem(int id) async {
+    final db = await instance.database;
+    final result = await db.query(
+      tableAlarms,
+      where: '${AlarmFields.id} = ?',
+      whereArgs: [id],
+    );
+    if (result.isNotEmpty) {
+      return AlarmItem.fromJson(result.first);
+    } else {
+      return null;
+    }
+  }
+
 }

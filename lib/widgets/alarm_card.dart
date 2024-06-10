@@ -59,8 +59,8 @@ Widget alarmListItem({
                       duration: const Duration(milliseconds: PASSIVE_ANIMATION_DURATION),
                       child: Text(
                         alarmItem.name,
-                        style: const TextStyle(fontSize: 16),
-                        maxLines: 1,
+                        style: alarmItem.name.length <= 15 ? TextStyle(fontSize: 16) : TextStyle(fontSize: 10),
+                        maxLines: alarmItem.name.length <= 15 ? 1 : 2,
                       ),
                     ),
                     AnimatedOpacity(

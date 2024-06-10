@@ -101,13 +101,13 @@ class _MyHomePageState extends State<MyHomePage> {
     final alarmSettings = AlarmSettings(
       id: alarm.id!,
       dateTime: alarmDateTimeToSet,
-      assetAudioPath: 'assets/alarm.mp3',
+      assetAudioPath: 'assets/alarm.mp3', //TODO: Get From user
       loopAudio: true,
-      vibrate: true,
+      vibrate: false, //TODO: Get from user
       volume: 0.8,
       fadeDuration: 3.0,
       notificationTitle: alarm.name,
-      notificationBody: 'This is the body',
+      notificationBody: 'This is the body', //TODO: Fix
       enableNotificationOnKill: true,
     );
 
@@ -123,14 +123,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> navigateToRingScreen(AlarmSettings alarmSettings) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute<void>(
-        builder: (context) =>
-            ExampleAlarmRingScreen(alarmSettings: alarmSettings),
-      ),
-    );
-    _loadAlarms();
+    AlarmItem? alarmItem = await DatabaseHelper.instance.findAlarmItem(alarmSettings.id);
+    if (alarmItem != null) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute<void>(
+          builder: (context) =>
+              ExampleAlarmRingScreen(alarmSettings: alarmSettings, alarmItem: alarmItem),
+        ),
+      );
+      _loadAlarms();
+    }
   }
 
   @override

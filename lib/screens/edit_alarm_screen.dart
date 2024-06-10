@@ -148,7 +148,7 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                 decoration: const InputDecoration(
                   labelText: 'Alarm Adı',
                 ),
-                maxLength: 15, // Limit the input to 15 characters
+                maxLength: 60, // Limit the input to 15 characters
               ),
             ),
             const SizedBox(height: 20),
