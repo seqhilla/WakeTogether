@@ -106,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
       //TODO: Get From user
       loopAudio: true,
       vibrate: alarm.isVibration,
-      volume: alarm.soundLevel.toDouble(),
+      volume: alarm.soundLevel / 100,
       fadeDuration: 3.0,
       notificationTitle: "Alarm Çalıyor",
       notificationBody: alarm.name,

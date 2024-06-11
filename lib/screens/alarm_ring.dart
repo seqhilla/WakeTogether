@@ -18,7 +18,7 @@ class AlarmRingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    counterToCancel(context, 3);
+    counterToCancel(context, 66); //TODO: 3 falan olabilir karar ver şimdilik yüksek
     return Scaffold(
       body: SafeArea(
         child: Column(
