@@ -108,8 +108,8 @@ class _MyHomePageState extends State<MyHomePage> {
       vibrate: alarm.isVibration,
       volume: alarm.soundLevel.toDouble(),
       fadeDuration: 3.0,
-      notificationTitle: alarm.name,
-      notificationBody: 'This is the body',
+      notificationTitle: "Alarm Çalıyor",
+      notificationBody: alarm.name,
       //TODO: Fix
       enableNotificationOnKill: true,
     );

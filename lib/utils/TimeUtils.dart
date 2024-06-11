@@ -187,7 +187,6 @@ toTimeOfDayFromDateTime(DateTime time) {
 }
 
 String getDayMonth(DateTime dateTime) {
-  return '${getShortDayName(dateTime.weekday)}, ${dateTime.day} ${getMonthName(dateTime.month)}';
+  return '${getDayName(dateTime.weekday)}, ${dateTime.day} ${getMonthName(dateTime.month)}';
 }
-
 

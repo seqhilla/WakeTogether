@@ -79,6 +79,15 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
               shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16.0))),
               child: Column(
                 children: [
+                  const SizedBox(height: 30),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16.0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(getDateText(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -240,4 +249,36 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
       await DatabaseHelper.instance.update(alarm);
     }
   }
+
+  String getDateText() {
+    String textToReturn = "";
+
+    // Check if all elements in _daysActive are false
+    if (_daysActive.every((day) => day == false)) {
+      final now = DateTime.now();
+      final alarmTimeToday = DateTime(now.year, now.month, now.day, _selectedTime.hour, _selectedTime.minute);
+      if (now.isAfter(alarmTimeToday)) {
+        // The alarm is set for tomorrow
+        final tomorrow = DateTime(now.year, now.month, now.day + 1);
+        textToReturn = "Yarın - " + getDayMonth(tomorrow);
+      } else {
+        // The alarm is set for today
+        textToReturn = "Bugün - " + getDayMonth(now);
+      }
+    } else {
+      for (int i = 0; i < _daysActive.length; i++) {
+        if (_daysActive[i]) {
+          textToReturn += getShortDayName(i + 1) + ", ";
+        }
+      }
+      // Remove the trailing comma
+      if (textToReturn.endsWith(",")) {
+        textToReturn = textToReturn.substring(0, textToReturn.length - 1);
+      }
+      textToReturn = "Her $textToReturn";
+    }
+
+    return textToReturn;
+  }
+
 }
