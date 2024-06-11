@@ -79,7 +79,7 @@ class AlarmRingScreen extends StatelessWidget {
   }
 
   void onSnoozePressed(BuildContext context, int minuteToDelay) {
-    final now = DateTime.now(); //TODO: Fix snooze resuchaling in main menu
+    final now = DateTime.now(); //TODO: Ötüyor fakat görünmez :(
     Alarm.set(
       alarmSettings: alarmSettings.copyWith(
         dateTime: DateTime(

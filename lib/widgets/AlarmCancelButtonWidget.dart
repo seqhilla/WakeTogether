@@ -111,7 +111,6 @@ class _PullAwayCancelWidgetState extends State<PullAwayCancelWidget>
             setState(() {
               _dragDistance =
                   (details.globalPosition - _centerCoordinate).distance;
-              print(_dragDistance);
               if (_dragDistance < 40) {
                 _secondaryCircleSize = 80;
               } else {
