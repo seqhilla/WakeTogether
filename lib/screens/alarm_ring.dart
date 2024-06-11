@@ -89,8 +89,11 @@ class AlarmRingScreen extends StatelessWidget {
           now.hour,
           now.minute,
         ).add(Duration(minutes: minuteToDelay)),
+        id: alarmSettings.id + 10000,
       ),
-    ).then((_) => Navigator.pop(context));
+    );
+
+    safeStopTheAlarm(context);
   }
 
   void counterToCancel(BuildContext context, int minute) async {

@@ -103,14 +103,12 @@ class _MyHomePageState extends State<MyHomePage> {
       id: alarm.id!,
       dateTime: alarmDateTimeToSet,
       assetAudioPath: 'assets/alarm.mp3',
-      //TODO: Get From user
       loopAudio: true,
       vibrate: alarm.isVibration,
       volume: alarm.soundLevel / 100,
       fadeDuration: 3.0,
       notificationTitle: "Alarm Çalıyor",
       notificationBody: alarm.name,
-      //TODO: Fix
       enableNotificationOnKill: true,
     );
 
