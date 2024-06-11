@@ -25,6 +25,7 @@ class DatabaseHelper {
     const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
     const boolType = 'BOOLEAN NOT NULL';
     const textType = 'TEXT NOT NULL';
+    const intType = 'INTEGER NOT NULL';
 
     await db.execute('''
 CREATE TABLE $tableAlarms (
@@ -33,7 +34,9 @@ CREATE TABLE $tableAlarms (
   ${AlarmFields.time} $textType,
   ${AlarmFields.daysActive} $textType,
   ${AlarmFields.isActive} $boolType,
-  ${AlarmFields.isSingleAlarm} $boolType
+  ${AlarmFields.isSingleAlarm} $boolType,
+  ${AlarmFields.soundLevel} $intType,
+  ${AlarmFields.isVibration} $boolType
 )
 ''');
   }

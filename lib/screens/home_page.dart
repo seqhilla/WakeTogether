@@ -75,13 +75,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _toggleActive(int index, bool newValue) async {
     final alarm = AlarmItem(
-      id: alarms[index].id,
-      name: alarms[index].name,
-      time: alarms[index].time,
-      daysActive: alarms[index].daysActive,
-      isActive: newValue,
-      isSingleAlarm: alarms[index].isSingleAlarm
-    );
+        id: alarms[index].id,
+        name: alarms[index].name,
+        time: alarms[index].time,
+        daysActive: alarms[index].daysActive,
+        isActive: newValue,
+        isSingleAlarm: alarms[index].isSingleAlarm,
+        soundLevel: alarms[index].soundLevel,
+        isVibration: alarms[index].isVibration);
 
     await DatabaseHelper.instance.update(alarm);
     setState(() {
@@ -101,13 +102,15 @@ class _MyHomePageState extends State<MyHomePage> {
     final alarmSettings = AlarmSettings(
       id: alarm.id!,
       dateTime: alarmDateTimeToSet,
-      assetAudioPath: 'assets/alarm.mp3', //TODO: Get From user
+      assetAudioPath: 'assets/alarm.mp3',
+      //TODO: Get From user
       loopAudio: true,
-      vibrate: false, //TODO: Get from user
-      volume: 0.8,
+      vibrate: alarm.isVibration,
+      volume: alarm.soundLevel.toDouble(),
       fadeDuration: 3.0,
       notificationTitle: alarm.name,
-      notificationBody: 'This is the body', //TODO: Fix
+      notificationBody: 'This is the body',
+      //TODO: Fix
       enableNotificationOnKill: true,
     );
 
@@ -123,13 +126,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> navigateToRingScreen(AlarmSettings alarmSettings) async {
-    AlarmItem? alarmItem = await DatabaseHelper.instance.findAlarmItem(alarmSettings.id);
+    AlarmItem? alarmItem =
+        await DatabaseHelper.instance.findAlarmItem(alarmSettings.id);
     if (alarmItem != null) {
       await Navigator.push(
         context,
         MaterialPageRoute<void>(
-          builder: (context) =>
-              AlarmRingScreen(alarmSettings: alarmSettings, alarmItem: alarmItem),
+          builder: (context) => AlarmRingScreen(
+              alarmSettings: alarmSettings, alarmItem: alarmItem),
         ),
       );
       _loadAlarms();
@@ -148,13 +152,15 @@ class _MyHomePageState extends State<MyHomePage> {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                  const EditAlarmScreen(
-                    initialAlarm: AlarmItem(name: '',
+                  builder: (context) => const EditAlarmScreen(
+                    initialAlarm: AlarmItem(
+                        name: '',
                         time: "06:00",
                         daysActive: '0,0,0,0,0,0,0',
                         isActive: true,
-                        isSingleAlarm: true),
+                        isSingleAlarm: true,
+                        soundLevel: 80,
+                        isVibration: true),
                     isNew: true,
                   ),
                 ),

@@ -24,6 +24,8 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
   late TextEditingController _alarmNameController;
   late TimeOfDay _selectedTime;
   late List<bool> _daysActive;
+  late int _soundLevel;
+  late bool _isVibration;
 
   @override
   void initState() {
@@ -35,6 +37,8 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
         .split(',')
         .map((e) => e == 'true')
         .toList();
+    _soundLevel = widget.initialAlarm.soundLevel;
+    _isVibration = widget.initialAlarm.isVibration;
   }
 
   @override
@@ -62,7 +66,7 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                 fontSize: 48,
               ),
               highlightedTextStyle:
-                  const TextStyle(fontSize: 48, color: Colors.blue),
+              const TextStyle(fontSize: 48, color: Colors.blue),
               isForce2Digits: true,
               onTimeChange: (time) {
                 setState(() {
@@ -71,67 +75,114 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
               },
             ),
             const SizedBox(height: 20),
-            // Added space between alarm time and day selection
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: List<Widget>.generate(7 * 2 - 1, (int index) {
-                  if (index % 2 == 1) {
-                    return SizedBox(width: 8); // Spacer
-                  }
-                  int dayIndex = index ~/ 2;
-                  final bool isActive = _daysActive[dayIndex];
-                  final bool isWeekend = dayIndex == 5 || dayIndex == 6;
-                  final Color borderColor =
-                      isActive ? Colors.lightBlue : Colors.transparent;
-                  //final Color activeBackgroundColor = isActive ? Colors.lightBlue[100]! : Colors.transparent;
-                  final Color activeTextColor =
-                      isActive ? Colors.lightBlue : Colors.black;
-                  final Color inactiveTextColor =
-                      isWeekend ? Colors.red : Colors.black;
+            Card(
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16.0))),
+              child: Column(
+                children: [
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: List<Widget>.generate(7 * 2 - 1, (int index) {
+                        if (index % 2 == 1) {
+                          return const SizedBox(width: 8); // Spacer
+                        }
+                        int dayIndex = index ~/ 2;
+                        final bool isActive = _daysActive[dayIndex];
+                        final bool isWeekend = dayIndex == 5 || dayIndex == 6;
+                        final Color borderColor =
+                        isActive ? Colors.lightBlue : Colors.transparent;
+                        final Color activeTextColor =
+                        isActive ? Colors.lightBlue : Colors.black;
+                        final Color inactiveTextColor =
+                        isWeekend ? Colors.red : Colors.black;
 
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _daysActive[dayIndex] = !_daysActive[dayIndex];
-                      });
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: 30,
-                      height: 30,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: borderColor),
-                        borderRadius: BorderRadius.circular(40),
-                      ),
-                      child: Text(
-                        ['P', 'S', 'Ç', 'P', 'C', 'C', 'P'][dayIndex],
-                        style: TextStyle(
-                            color:
-                                isActive ? activeTextColor : inactiveTextColor),
-                      ),
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _daysActive[dayIndex] = !_daysActive[dayIndex];
+                            });
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: 30,
+                            height: 30,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: borderColor),
+                              borderRadius: BorderRadius.circular(40),
+                            ),
+                            child: Text(
+                              ['P', 'S', 'Ç', 'P', 'C', 'C', 'P'][dayIndex],
+                              style: TextStyle(
+                                  color: isActive ? activeTextColor : inactiveTextColor),
+                            ),
+                          ),
+                        );
+                      }),
                     ),
-                  );
-                }),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: TextField(
+                      controller: _alarmNameController,
+                      decoration: InputDecoration(
+                        labelText: 'Alarm Adı',
+                        counterText: '', // This hides the counter
+                        border: UnderlineInputBorder(
+                          borderSide: BorderSide(width: 2.0), // This makes the underline thicker
+                        ),
+                      ),
+                      maxLength: 60,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(left: 16.0),
+                        child: Text('Ses Seviyesi', style: TextStyle(fontSize: 16)),
+                      ),
+                      Expanded(
+                        child: Slider(
+                          value: _soundLevel.toDouble(),
+                          min: 0,
+                          max: 100,
+                          divisions: 100,
+                          label: _soundLevel.round().toString(),
+                          onChanged: (double value) {
+                            setState(() {
+                              _soundLevel = value.round();
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(color: Colors.grey),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(left: 16.0),
+                        child: Text('Titreşim', style: TextStyle(fontSize: 16)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 16.0),
+                        child: Switch(
+                          value: _isVibration,
+                          onChanged: (bool value) {
+                            setState(() {
+                              _isVibration = value;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                ],
               ),
             ),
-            const SizedBox(height: 20),
-            // Added space before the TextField
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              // Adjust the padding value as needed
-              child: TextField(
-                controller: _alarmNameController,
-                decoration: const InputDecoration(
-                  labelText: 'Alarm Adı',
-                ),
-                maxLength: 60, // Limit the input to 15 characters
-              ),
-            ),
-            const SizedBox(height: 20),
-            // Added space before the buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -139,7 +190,6 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                   onPressed: () => Navigator.pop(context),
                   child: const Text('İptal'),
                 ),
-                //Sil butonu ekle
                 ElevatedButton(
                   onPressed: () async {
                     if (widget.initialAlarm.id != null) {
@@ -149,7 +199,6 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                   },
                   child: const Text('Sil'),
                 ),
-
                 ElevatedButton(
                   onPressed: () {
                     bool isAlarmSingle = true;
@@ -165,7 +214,9 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                       time: to24hFormat(_selectedTime),
                       daysActive: _daysActive.isEmpty ? "" : _daysActive.join(','),
                       isActive: true,
-                      isSingleAlarm: isAlarmSingle
+                      isSingleAlarm: isAlarmSingle,
+                      soundLevel: _soundLevel,
+                      isVibration: _isVibration,
                     );
                     saveOrUpdateTheAlarm(alarm);
                     showClosestAlarmToastMessage(alarm);

@@ -2,6 +2,7 @@ import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:waketogether/data/AlarmItem.dart';
+import 'package:waketogether/utils/DatabaseHelper.dart';
 import '../widgets/AlarmCancelButtonWidget.dart';
 import '../widgets/ClockWidget.dart';
 
@@ -17,6 +18,7 @@ class AlarmRingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    counterToCancel(context, 3);
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -25,9 +27,8 @@ class AlarmRingScreen extends StatelessWidget {
             ClockWidget(key: UniqueKey(), alarmText: alarmItem.name),
             SizedBox(height: 80),
             SizedBox(height: 300, width: 300, child: PullAwayCancelWidget(onCancel: () {
-              Alarm.stop(alarmSettings.id)
-                .then((_) => Navigator.pop(context));
-              },),),
+              safeStopTheAlarm(context);
+            })),
             Text("Şu kadar ertele:", style: Theme.of(context).textTheme.titleLarge),
             SizedBox(height: 20),
             Row(
@@ -78,7 +79,7 @@ class AlarmRingScreen extends StatelessWidget {
   }
 
   void onSnoozePressed(BuildContext context, int minuteToDelay) {
-    final now = DateTime.now();
+    final now = DateTime.now(); //TODO: Fix snooze resuchaling in main menu
     Alarm.set(
       alarmSettings: alarmSettings.copyWith(
         dateTime: DateTime(
@@ -91,4 +92,30 @@ class AlarmRingScreen extends StatelessWidget {
       ),
     ).then((_) => Navigator.pop(context));
   }
+
+  void counterToCancel(BuildContext context, int minute) async {
+    await Future.delayed(Duration(minutes: minute));
+    if (Navigator.of(context).canPop()) {
+      safeStopTheAlarm(context);
+    }
+  }
+
+  void safeStopTheAlarm(BuildContext context) {
+    if (alarmItem.isSingleAlarm == true) {
+      final alarm = AlarmItem(
+          id: alarmItem.id,
+          name: alarmItem.name,
+          time: alarmItem.time,
+          daysActive: alarmItem.daysActive,
+          isActive: false,
+          isSingleAlarm: alarmItem.isSingleAlarm,
+          soundLevel: alarmItem.soundLevel,
+          isVibration: alarmItem.isVibration
+      );
+      DatabaseHelper.instance.update(alarm);
+    }
+
+    Alarm.stop(alarmSettings.id).then((_) => Navigator.pop(context));
+  }
+
 }
