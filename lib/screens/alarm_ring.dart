@@ -24,9 +24,9 @@ class AlarmRingScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             ClockWidget(key: UniqueKey(), alarmText: alarmItem.name),
-            SizedBox(height: 80),
+            const SizedBox(height: 80),
             SizedBox(
                 height: 300,
                 width: 300,
@@ -35,7 +35,7 @@ class AlarmRingScreen extends StatelessWidget {
                 })),
             Text("Şu kadar ertele:",
                 style: Theme.of(context).textTheme.titleLarge),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
