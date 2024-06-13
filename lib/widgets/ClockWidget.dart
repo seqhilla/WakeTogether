@@ -21,7 +21,7 @@ class ClockWidget extends StatelessWidget {
               style: const TextStyle(fontSize: 64, fontWeight: FontWeight.bold),
             ),
             Text(
-              getDayMonth(DateTime.now()),
+              TimeUtils.getDayMonth(DateTime.now()),
               style: const TextStyle(fontSize: 20),
             ),
             Padding(

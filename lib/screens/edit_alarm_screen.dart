@@ -32,7 +32,7 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
     super.initState();
     _alarmNameController =
         TextEditingController(text: widget.initialAlarm.name);
-    _selectedTime = toTimeOfDay(widget.initialAlarm.time);
+    _selectedTime = TimeUtils.toTimeOfDay(widget.initialAlarm.time);
     _daysActive = widget.initialAlarm.daysActive
         .split(',')
         .map((e) => e == 'true')
@@ -56,7 +56,7 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
             const SizedBox(height: 30),
             TimePickerSpinner(
               locale: const Locale('en', ''),
-              time: toDateTimeFromTimeOfDay(_selectedTime),
+              time: TimeUtils.toDateTimeFromTimeOfDay(_selectedTime),
               is24HourMode: true,
               isShowSeconds: false,
               itemHeight: 60,
@@ -70,7 +70,7 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
               isForce2Digits: true,
               onTimeChange: (time) {
                 setState(() {
-                  _selectedTime = toTimeOfDayFromDateTime(time);
+                  _selectedTime = TimeUtils.toTimeOfDayFromDateTime(time);
                 });
               },
             ),
@@ -238,7 +238,7 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                     final alarm = AlarmItem(
                       id: widget.initialAlarm.id,
                       name: _alarmNameController.text,
-                      time: to24hFormat(_selectedTime),
+                      time: TimeUtils.to24hFormat(_selectedTime),
                       daysActive:
                           _daysActive.isEmpty ? "" : _daysActive.join(','),
                       isActive: true,
@@ -247,7 +247,7 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                       isVibration: _isVibration,
                     );
                     saveOrUpdateTheAlarm(alarm);
-                    showClosestAlarmToastMessage(alarm);
+                    GeneralUtils.showClosestAlarmToastMessage(alarm);
                     Navigator.pop(context, true);
                   },
                   child: const Text('Kaydet'),
@@ -280,15 +280,15 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
       if (now.isAfter(alarmTimeToday)) {
         // The alarm is set for tomorrow
         final tomorrow = DateTime(now.year, now.month, now.day + 1);
-        textToReturn = "Yarın - ${getDayMonth(tomorrow)}";
+        textToReturn = "Yarın - ${TimeUtils.getDayMonth(tomorrow)}";
       } else {
         // The alarm is set for today
-        textToReturn = "Bugün - ${getDayMonth(now)}";
+        textToReturn = "Bugün - ${TimeUtils.getDayMonth(now)}";
       }
     } else {
       for (int i = 0; i < _daysActive.length; i++) {
         if (_daysActive[i]) {
-          textToReturn += "${getShortDayName(i + 1)}, ";
+          textToReturn += "${TimeUtils.getShortDayName(i + 1)}, ";
         }
       }
       // Remove the trailing comma

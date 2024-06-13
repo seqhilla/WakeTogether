@@ -97,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _scheduleAlarm(AlarmItem alarm, bool isFromToggle) async {
-    final alarmDateTimeToSet = getClosestDateTimeInAlarm(alarm);
+    final alarmDateTimeToSet = TimeUtils.getClosestDateTimeInAlarm(alarm);
 
     final alarmSettings = AlarmSettings(
       id: alarm.id!,
@@ -113,7 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
     if (isFromToggle) {
-      showClosestAlarmToastMessage(alarm);
+      GeneralUtils.showClosestAlarmToastMessage(alarm);
     }
 
     await Alarm.set(alarmSettings: alarmSettings);
@@ -124,6 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> navigateToRingScreen(AlarmSettings alarmSettings) async {
+    print("*****************************I WANT TO DRIVE CADILLAC********************");
     AlarmItem? alarmItem =
         await DatabaseHelper.instance.findAlarmItem(alarmSettings.id);
     if (alarmItem != null) {
@@ -134,7 +135,8 @@ class _MyHomePageState extends State<MyHomePage> {
               alarmSettings: alarmSettings, alarmItem: alarmItem),
         ),
       );
-      _loadAlarms();
+      print("*****************************I WANT TO DRIVE CADILLAC 2********************");
+      //_loadAlarms(); TODO: Why did I put this here
     }
   }
 

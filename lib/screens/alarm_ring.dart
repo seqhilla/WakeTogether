@@ -36,10 +36,10 @@ class AlarmRingScreen extends StatelessWidget {
               children: [
                 RawMaterialButton(
                   onPressed: () {
-                    onSnoozePressed(context, 5);
+                    onSnoozePressed(context, 1);
                   },
                   child: Text(
-                    '5 Dk',
+                    '1 Dk',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
