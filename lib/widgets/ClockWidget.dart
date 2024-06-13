@@ -6,7 +6,8 @@ import '../utils/TimeUtils.dart';
 class ClockWidget extends StatelessWidget {
   final String alarmText;
 
-  const ClockWidget({required Key key, required this.alarmText}) : super(key: key);
+  const ClockWidget({required Key key, required this.alarmText})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

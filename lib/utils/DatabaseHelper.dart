@@ -28,17 +28,17 @@ class DatabaseHelper {
     const intType = 'INTEGER NOT NULL';
 
     await db.execute('''
-CREATE TABLE $tableAlarms (
-  ${AlarmFields.id} $idType,
-  ${AlarmFields.name} $textType,
-  ${AlarmFields.time} $textType,
-  ${AlarmFields.daysActive} $textType,
-  ${AlarmFields.isActive} $boolType,
-  ${AlarmFields.isSingleAlarm} $boolType,
-  ${AlarmFields.soundLevel} $intType,
-  ${AlarmFields.isVibration} $boolType
-)
-''');
+          CREATE TABLE $tableAlarms (
+            ${AlarmFields.id} $idType,
+            ${AlarmFields.name} $textType,
+            ${AlarmFields.time} $textType,
+            ${AlarmFields.daysActive} $textType,
+            ${AlarmFields.isActive} $boolType,
+            ${AlarmFields.isSingleAlarm} $boolType,
+            ${AlarmFields.soundLevel} $intType,
+            ${AlarmFields.isVibration} $boolType
+          )
+        ''');
   }
 
   Future<AlarmItem> create(AlarmItem alarm) async {
@@ -114,5 +114,4 @@ CREATE TABLE $tableAlarms (
       return null;
     }
   }
-
 }

@@ -18,7 +18,8 @@ class AlarmRingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    counterToCancel(context, 66); //TODO: 3 falan olabilir karar ver şimdilik yüksek
+    counterToCancel(
+        context, 66); //TODO: 3 falan olabilir karar ver şimdilik yüksek
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -26,10 +27,14 @@ class AlarmRingScreen extends StatelessWidget {
             SizedBox(height: 40),
             ClockWidget(key: UniqueKey(), alarmText: alarmItem.name),
             SizedBox(height: 80),
-            SizedBox(height: 300, width: 300, child: PullAwayCancelWidget(onCancel: () {
-              safeStopTheAlarm(context);
-            })),
-            Text("Şu kadar ertele:", style: Theme.of(context).textTheme.titleLarge),
+            SizedBox(
+                height: 300,
+                width: 300,
+                child: PullAwayCancelWidget(onCancel: () {
+                  safeStopTheAlarm(context);
+                })),
+            Text("Şu kadar ertele:",
+                style: Theme.of(context).textTheme.titleLarge),
             SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -113,12 +118,10 @@ class AlarmRingScreen extends StatelessWidget {
           isActive: false,
           isSingleAlarm: alarmItem.isSingleAlarm,
           soundLevel: alarmItem.soundLevel,
-          isVibration: alarmItem.isVibration
-      );
+          isVibration: alarmItem.isVibration);
       DatabaseHelper.instance.update(alarm);
     }
 
     Alarm.stop(alarmSettings.id).then((_) => Navigator.pop(context));
   }
-
 }

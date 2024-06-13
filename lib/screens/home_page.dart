@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -124,7 +123,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> navigateToRingScreen(AlarmSettings alarmSettings) async {
-    print("*****************************I WANT TO DRIVE CADILLAC********************");
+    print(
+        "*****************************I WANT TO DRIVE CADILLAC********************");
     AlarmItem? alarmItem =
         await DatabaseHelper.instance.findAlarmItem(alarmSettings.id);
     if (alarmItem != null) {
@@ -135,7 +135,8 @@ class _MyHomePageState extends State<MyHomePage> {
               alarmSettings: alarmSettings, alarmItem: alarmItem),
         ),
       );
-      print("*****************************I WANT TO DRIVE CADILLAC 2********************");
+      print(
+          "*****************************I WANT TO DRIVE CADILLAC 2********************");
       //_loadAlarms(); TODO: Why did I put this here
     }
   }

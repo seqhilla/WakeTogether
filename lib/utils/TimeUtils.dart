@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../data/AlarmItem.dart';
 
 class TimeUtils {
-
   static String to24hFormat(TimeOfDay time) {
     final hours = time.hour.toString().padLeft(2, '0');
     final minutes = time.minute.toString().padLeft(2, '0');
@@ -21,11 +20,12 @@ class TimeUtils {
     if (dateTimeList.length == 1) {
       dateTimeToReturn = dateTimeList[0];
     } else {
-      for(var time in dateTimeList) {
+      for (var time in dateTimeList) {
         if (dateTimeToReturn == null) {
           dateTimeToReturn = time;
         } else {
-          if (time.difference(now).inSeconds < dateTimeToReturn.difference(now).inSeconds) {
+          if (time.difference(now).inSeconds <
+              dateTimeToReturn.difference(now).inSeconds) {
             dateTimeToReturn = time;
           }
         }
@@ -37,14 +37,17 @@ class TimeUtils {
 
   static List<DateTime> getActivaAlarmDateList(AlarmItem alarm) {
     final time = toTimeOfDay(alarm.time);
-    final daysActive = alarm.daysActive.split(',').map((e) => e == 'true').toList();
+    final daysActive =
+        alarm.daysActive.split(',').map((e) => e == 'true').toList();
     final now = DateTime.now();
     List<DateTime> realAlarmDateTime = [];
 
     if (alarm.isSingleAlarm == true) {
-      DateTime fakeAlarmDate = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+      DateTime fakeAlarmDate =
+          DateTime(now.year, now.month, now.day, time.hour, time.minute);
       if (fakeAlarmDate.microsecondsSinceEpoch < now.microsecondsSinceEpoch) {
-        DateTime alarmDateTime = DateTime(now.year, now.month, now.day + 1, time.hour, time.minute);
+        DateTime alarmDateTime =
+            DateTime(now.year, now.month, now.day + 1, time.hour, time.minute);
         realAlarmDateTime.add(alarmDateTime);
       } else {
         realAlarmDateTime.add(fakeAlarmDate);
@@ -55,15 +58,20 @@ class TimeUtils {
           int currentDayOfWeek = now.weekday - 1;
           //TODO: Fix next month and next year issue
           if (i >= currentDayOfWeek) {
-            DateTime alarmDateTime = DateTime(now.year, now.month, now.day + (i - currentDayOfWeek), time.hour, time.minute);
-            if (alarmDateTime.microsecondsSinceEpoch > now.microsecondsSinceEpoch) {
+            DateTime alarmDateTime = DateTime(now.year, now.month,
+                now.day + (i - currentDayOfWeek), time.hour, time.minute);
+            if (alarmDateTime.microsecondsSinceEpoch >
+                now.microsecondsSinceEpoch) {
               realAlarmDateTime.add(alarmDateTime);
             } else {
-              DateTime alarmDateTime = DateTime(now.year, now.month, now.day + (7 - currentDayOfWeek + i), time.hour, time.minute);
+              DateTime alarmDateTime = DateTime(now.year, now.month,
+                  now.day + (7 - currentDayOfWeek + i), time.hour, time.minute);
               realAlarmDateTime.add(alarmDateTime);
             }
-          } else { //TODO: check maybe Not usefull at all
-            DateTime alarmDateTime = DateTime(now.year, now.month, now.day + (7 - currentDayOfWeek + i), time.hour, time.minute);
+          } else {
+            //TODO: check maybe Not usefull at all
+            DateTime alarmDateTime = DateTime(now.year, now.month,
+                now.day + (7 - currentDayOfWeek + i), time.hour, time.minute);
             realAlarmDateTime.add(alarmDateTime);
           }
         }
@@ -181,7 +189,6 @@ class TimeUtils {
     }
   }
 
-
   static String getHowManyTimeFromNow(DateTime dateTime) {
     final now = DateTime.now();
     final difference = dateTime.difference(now);
@@ -212,7 +219,8 @@ class TimeUtils {
   static toDateTimeFromString(String time) {
     final now = DateTime.now();
     final parts = time.split(':');
-    return DateTime(now.year, now.month, now.day, int.parse(parts[0]), int.parse(parts[1]));
+    return DateTime(
+        now.year, now.month, now.day, int.parse(parts[0]), int.parse(parts[1]));
   }
 
   static toTimeOfDayFromDateTime(DateTime time) {
@@ -222,6 +230,4 @@ class TimeUtils {
   static String getDayMonth(DateTime dateTime) {
     return '${getDayName(dateTime.weekday)}, ${dateTime.day} ${getShortMonthName(dateTime.month)}';
   }
-
 }
-

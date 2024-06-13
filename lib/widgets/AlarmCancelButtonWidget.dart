@@ -65,8 +65,7 @@ class _PullAwayCancelWidgetState extends State<PullAwayCancelWidget>
             )),
         Visibility(
             visible: _showReverseAnimation,
-            child:
-            AnimatedBuilder(
+            child: AnimatedBuilder(
               animation: _animationController,
               builder: (context, child) {
                 return Stack(
@@ -96,7 +95,8 @@ class _PullAwayCancelWidgetState extends State<PullAwayCancelWidget>
         GestureDetector(
           onPanStart: (details) {
             final RenderBox box = context.findRenderObject() as RenderBox;
-            final Offset center = box.localToGlobal(box.size.center(Offset.zero));
+            final Offset center =
+                box.localToGlobal(box.size.center(Offset.zero));
             _centerCoordinate = center;
             _showAnimate = false;
             _showReverseAnimation = true;

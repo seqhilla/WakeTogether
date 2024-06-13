@@ -125,7 +125,8 @@ Widget alarmListItem({
                     duration: const Duration(
                         milliseconds: PASSIVE_ANIMATION_DURATION),
                     child: Text(
-                        TimeUtils.getDayMonth(TimeUtils.getClosestDateTimeInAlarm(alarmItem)),
+                        TimeUtils.getDayMonth(
+                            TimeUtils.getClosestDateTimeInAlarm(alarmItem)),
                         style: const TextStyle(fontSize: 12)),
                   )),
               const SizedBox(width: 16),

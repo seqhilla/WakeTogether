@@ -5,7 +5,6 @@ import '../data/AlarmItem.dart';
 import 'TimeUtils.dart';
 
 class GeneralUtils {
-
   static void showToastMessage(String message) {
     Fluttertoast.showToast(
         msg: message,
@@ -14,8 +13,7 @@ class GeneralUtils {
         timeInSecForIosWeb: 1,
         backgroundColor: Colors.grey,
         textColor: Colors.white,
-        fontSize: 16.0
-    );
+        fontSize: 16.0);
   }
 
   static void showClosestAlarmToastMessage(AlarmItem alarm) {
@@ -23,5 +21,4 @@ class GeneralUtils {
 
     showToastMessage(TimeUtils.getHowManyTimeFromNow(dateTimeToShow));
   }
-
 }
