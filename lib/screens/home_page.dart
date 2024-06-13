@@ -73,6 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _toggleActive(int index, bool newValue) async {
+    _cancelAlarm(10002); //TODO: Here for testing delete this
     final alarm = AlarmItem(
         id: alarms[index].id,
         name: alarms[index].name,
@@ -123,20 +124,19 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> navigateToRingScreen(AlarmSettings alarmSettings) async {
-    print(
-        "*****************************I WANT TO DRIVE CADILLAC********************");
     AlarmItem? alarmItem =
         await DatabaseHelper.instance.findAlarmItem(alarmSettings.id);
+
+    alarmItem ??= await DatabaseHelper.instance.findAlarmItem(alarmSettings.id - 10000); //if from snooze this is gonna work
+
     if (alarmItem != null) {
       await Navigator.push(
         context,
         MaterialPageRoute<void>(
           builder: (context) => AlarmRingScreen(
-              alarmSettings: alarmSettings, alarmItem: alarmItem),
+              alarmSettings: alarmSettings, alarmItem: alarmItem!),
         ),
       );
-      print(
-          "*****************************I WANT TO DRIVE CADILLAC 2********************");
       //_loadAlarms(); TODO: Why did I put this here
     }
   }

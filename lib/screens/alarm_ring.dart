@@ -9,8 +9,9 @@ import '../widgets/ClockWidget.dart';
 class AlarmRingScreen extends StatelessWidget {
   final AlarmSettings alarmSettings;
   final AlarmItem alarmItem;
+  bool isCancelled = false; // Yeni değişken
 
-  const AlarmRingScreen({
+  AlarmRingScreen({
     required this.alarmSettings,
     required this.alarmItem,
     super.key,
@@ -19,7 +20,7 @@ class AlarmRingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     counterToCancel(
-        context, 66); //TODO: 3 falan olabilir karar ver şimdilik yüksek
+        context, 3); //TODO: Get from user
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -41,7 +42,7 @@ class AlarmRingScreen extends StatelessWidget {
               children: [
                 RawMaterialButton(
                   onPressed: () {
-                    onSnoozePressed(context, 1);
+                    onSnoozePressed(context, 1); //TODO: For snooze test this should be 5
                   },
                   child: Text(
                     '1 Dk',
@@ -84,7 +85,7 @@ class AlarmRingScreen extends StatelessWidget {
   }
 
   void onSnoozePressed(BuildContext context, int minuteToDelay) {
-    final now = DateTime.now(); //TODO: Ötüyor fakat görünmez :(
+    final now = DateTime.now();
     Alarm.set(
       alarmSettings: alarmSettings.copyWith(
         dateTime: DateTime(
@@ -94,7 +95,7 @@ class AlarmRingScreen extends StatelessWidget {
           now.hour,
           now.minute,
         ).add(Duration(minutes: minuteToDelay)),
-        id: alarmSettings.id + 10000,
+        id: alarmSettings.id < 9999 ? alarmSettings.id + 10000 : alarmSettings.id,
       ),
     );
 
@@ -103,12 +104,13 @@ class AlarmRingScreen extends StatelessWidget {
 
   void counterToCancel(BuildContext context, int minute) async {
     await Future.delayed(Duration(minutes: minute));
-    if (Navigator.of(context).canPop()) {
+    if (!isCancelled) {
       safeStopTheAlarm(context);
     }
   }
 
   void safeStopTheAlarm(BuildContext context) {
+    isCancelled = true;
     if (alarmItem.isSingleAlarm == true) {
       final alarm = AlarmItem(
           id: alarmItem.id,

@@ -230,4 +230,8 @@ class TimeUtils {
   static String getDayMonth(DateTime dateTime) {
     return '${getDayName(dateTime.weekday)}, ${dateTime.day} ${getShortMonthName(dateTime.month)}';
   }
+
+  static bool isBefore(DateTime dateTime) {
+    return dateTime.isBefore(DateTime.now());
+  }
 }
