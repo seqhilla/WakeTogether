@@ -81,12 +81,12 @@ class _TimePickerColumn extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = FixedExtentScrollController(initialItem: initialValue - minValue);
     return SizedBox(
-      width: 150,
-      height: 150,
+      width: 140,
+      height: 200,
       child: ListWheelScrollView.useDelegate(
         controller: controller,
         physics: const FixedExtentScrollPhysics(),
-        itemExtent: 50,
+        itemExtent: 75,
         diameterRatio: 5,
         onSelectedItemChanged: onValueChanged,
         childDelegate: ListWheelChildLoopingListDelegate(

@@ -55,7 +55,7 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 30),
+            const SizedBox(height: 40),
             ChangeNotifierProvider(
               create: (_) => TimeProvider(_selectedTime),
               child: CustomTimePicker(onTimeChanged: (TimeOfDay value) {
