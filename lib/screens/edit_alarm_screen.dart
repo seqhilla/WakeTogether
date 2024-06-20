@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:waketogether/data/AlarmItem.dart';
 import 'package:waketogether/utils/DatabaseHelper.dart';
 import 'package:waketogether/utils/TimeUtils.dart';
-import 'package:time_picker_spinner/time_picker_spinner.dart';
 
 import '../utils/GeneralUtils.dart';
 import '../widgets/time_picker.dart';
