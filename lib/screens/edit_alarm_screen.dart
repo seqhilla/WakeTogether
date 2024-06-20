@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:waketogether/data/AlarmItem.dart';
 import 'package:waketogether/utils/DatabaseHelper.dart';
 import 'package:waketogether/utils/TimeUtils.dart';
 import 'package:time_picker_spinner/time_picker_spinner.dart';
 
 import '../utils/GeneralUtils.dart';
+import '../widgets/time_picker.dart';
 
 class EditAlarmScreen extends StatefulWidget {
   final AlarmItem initialAlarm;
@@ -54,25 +56,13 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
         child: Column(
           children: [
             const SizedBox(height: 30),
-            TimePickerSpinner(
-              locale: const Locale('en', ''),
-              time: TimeUtils.toDateTimeFromTimeOfDay(_selectedTime),
-              is24HourMode: true,
-              isShowSeconds: false,
-              itemHeight: 60,
-              itemWidth: 100,
-              alignment: Alignment.center,
-              normalTextStyle: const TextStyle(
-                fontSize: 48,
-              ),
-              highlightedTextStyle:
-                  const TextStyle(fontSize: 48, color: Colors.blue),
-              isForce2Digits: true,
-              onTimeChange: (time) {
+            ChangeNotifierProvider(
+              create: (_) => TimeProvider(_selectedTime),
+              child: CustomTimePicker(onTimeChanged: (TimeOfDay value) {
                 setState(() {
-                  _selectedTime = TimeUtils.toTimeOfDayFromDateTime(time);
+                  _selectedTime = value;
                 });
-              },
+              },),
             ),
             const SizedBox(height: 20),
             Padding(

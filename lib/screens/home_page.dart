@@ -57,6 +57,10 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       alarms = dbAlarms.reversed.toList();
     });
+    for (var alarm in Alarm.getAlarms()) {
+      print(alarm.id);
+    }
+
     for (var alarm in alarms) {
       if (alarm.isActive) {
         _scheduleAlarm(alarm, false);
@@ -73,7 +77,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _toggleActive(int index, bool newValue) async {
-    _cancelAlarm(10002); //TODO: Here for testing delete this
     final alarm = AlarmItem(
         id: alarms[index].id,
         name: alarms[index].name,
@@ -137,7 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
               alarmSettings: alarmSettings, alarmItem: alarmItem!),
         ),
       );
-      //_loadAlarms(); TODO: Why did I put this here
+      _loadAlarms();
     }
   }
 
