@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "437090885039",
+    "project_id": "waketogether-d3561",
+    "storage_bucket": "waketogether-d3561.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:437090885039:android:92d57cf614d6c9e85c235a",
+        "android_client_info": {
+          "package_name": "com.seqhilla.waketogether"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "437090885039-ci9if9vni9racgagf4dg9p547433ct3n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfZlM09fvOS9Q6KGdMiKN4GLQ-ijinXsM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "437090885039-ci9if9vni9racgagf4dg9p547433ct3n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
