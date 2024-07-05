@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -10,6 +11,22 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<void> _createUserDocument(UserCredential userCredential) async {
+    final user = userCredential.user;
+    if (user != null) {
+      final userDoc = _firestore.collection('users').doc(user.uid);
+      final docSnapshot = await userDoc.get();
+      if (!docSnapshot.exists) {
+        await userDoc.set({
+          'uid': user.uid,
+          'email': user.email, //TODO şuanlık email kullanılıyor nickname vb bir şey bul
+          // Add other user properties
+        });
+      }
+    }
+  }
 
   Future<UserCredential?> _handleSignIn() async {
     try {
@@ -26,7 +43,12 @@ class _SignInPageState extends State<SignInPage> {
         idToken: googleAuth.idToken,
       );
 
-      return await _auth.signInWithCredential(credential);
+      final userCredential = await _auth.signInWithCredential(credential);
+
+      // Create a document for the user in Firestore
+      await _createUserDocument(userCredential);
+
+      return userCredential;
     } catch (e) {
       print(e);
       return null;

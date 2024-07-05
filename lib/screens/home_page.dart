@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:waketogether/screens/requests.dart';
 
 import '../data/AlarmItem.dart';
 import '../utils/DatabaseHelper.dart';
@@ -53,22 +56,46 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _loadAlarms() async {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+    // Get the email of the current user
+    String userEmail = FirebaseAuth.instance.currentUser!.email!;
+
+    // Clear all alarms from the local database
+    await DatabaseHelper.instance.deleteAll();
+
+    // Query the 'alarms' collection in Firestore
+    final alarmsSnapshot = await _firestore
+        .collection('alarms')
+        .where('AlarmUsers', arrayContains: userEmail)
+        .get();
+    print("HASAN + ${alarmsSnapshot.docs.length}");
+    // For each document in the query result
+    for (var doc in alarmsSnapshot.docs) {
+      // Create an AlarmItem object with the data from the document
+      AlarmItem alarm = AlarmItem(
+        id:doc['id'],
+        name: doc['name'],
+        time: doc['time'],
+        daysActive: doc['daysActive'],
+        isActive: doc['isActive'],
+        isSingleAlarm: doc['isSingleAlarm'],
+        soundLevel: doc['soundLevel'],
+        isVibration: doc['isVibration'],
+      );
+
+      // Add the alarm to the local database
+      await DatabaseHelper.instance.create(alarm);
+    }
+
+    // Reload alarms from the local database
     final dbAlarms = await DatabaseHelper.instance.readAllAlarms();
     setState(() {
       alarms = dbAlarms.reversed.toList();
     });
-    for (var alarm in Alarm.getAlarms()) {
-      print(alarm.id);
-    }
-
-    for (var alarm in alarms) {
-      if (alarm.isActive) {
-        _scheduleAlarm(alarm, false);
-      } else {
-        _cancelAlarm(alarm.id!);
-      }
-    }
   }
+
+
 
   @override
   void dispose() {
@@ -151,6 +178,10 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         actions: <Widget>[
           IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _loadAlarms,
+          ),
+          IconButton(
             icon: const Icon(Icons.add),
             onPressed: () async {
               final result = await Navigator.push(
@@ -172,6 +203,17 @@ class _MyHomePageState extends State<MyHomePage> {
               if (result != null) {
                 _loadAlarms(); // Reload alarms from database
               }
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.mail),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RequestsPage(),
+                ),
+              );
             },
           ),
         ],

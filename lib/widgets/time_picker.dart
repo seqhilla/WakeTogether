@@ -29,7 +29,8 @@ class TimeProvider extends ChangeNotifier {
 class CustomTimePicker extends StatelessWidget {
   final ValueChanged<TimeOfDay> onTimeChanged;
 
-  const CustomTimePicker({Key? key, required this.onTimeChanged}) : super(key: key);
+  const CustomTimePicker({Key? key, required this.onTimeChanged})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +43,8 @@ class CustomTimePicker extends StatelessWidget {
           maxValue: 23,
           onValueChanged: (value) {
             Provider.of<TimeProvider>(context, listen: false).setHour(value);
-            onTimeChanged(Provider.of<TimeProvider>(context, listen: false).time);
+            onTimeChanged(
+                Provider.of<TimeProvider>(context, listen: false).time);
           },
         ),
         const Text(':',
@@ -56,7 +58,8 @@ class CustomTimePicker extends StatelessWidget {
           maxValue: 59,
           onValueChanged: (value) {
             Provider.of<TimeProvider>(context, listen: false).setMinute(value);
-            onTimeChanged(Provider.of<TimeProvider>(context, listen: false).time);
+            onTimeChanged(
+                Provider.of<TimeProvider>(context, listen: false).time);
           },
         ),
       ],
@@ -79,7 +82,8 @@ class _TimePickerColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = FixedExtentScrollController(initialItem: initialValue - minValue);
+    final controller =
+        FixedExtentScrollController(initialItem: initialValue - minValue);
     return SizedBox(
       width: 140,
       height: 200,
@@ -93,7 +97,9 @@ class _TimePickerColumn extends StatelessWidget {
           children: List<Widget>.generate(maxValue - minValue + 1, (index) {
             final value = minValue + index;
             return GestureDetector(
-              onTap: () => controller.animateToItem(index, duration: const Duration(milliseconds: 250), curve: Curves.easeInOut),
+              onTap: () => controller.animateToItem(index,
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeInOut),
               child: Align(
                 alignment: Alignment.center,
                 child: Text(
