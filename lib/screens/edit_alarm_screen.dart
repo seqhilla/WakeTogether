@@ -317,8 +317,6 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
   }
 
   Future<void> _saveOrUpdateAlarmToFirestore(AlarmItem alarm, String userEmail) async {
-
-
     int alarmId;
     if (alarm.id == null) {
       // If this is a new alarm, get the last alarm ID and increment it by 1
@@ -328,7 +326,14 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
       // If this is an existing alarm, use its current ID
       alarmId = alarm.id!;
     }
-
+    List<String> alarmUsers = [userEmail];
+    if (!widget.isNew) {
+      DocumentSnapshot alarmSnapshot = await _firestore
+          .collection('alarms')
+          .doc('${userEmail}_${alarmId}')
+          .get();
+      alarmUsers = List<String>.from(alarmSnapshot['AlarmUsers']);
+    }
     final alarmData = {
       'id': alarmId,
       'name': alarm.name,
@@ -338,12 +343,11 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
       'isSingleAlarm': alarm.isSingleAlarm,
       'soundLevel': alarm.soundLevel,
       'isVibration': alarm.isVibration,
-      'AlarmUsers': [userEmail], // Add the AlarmUsers field
+      'AlarmUsers': alarmUsers, // Add the AlarmUsers field
     };
 
     // Save the alarm data to the 'alarms' collection in Firestore
     await _firestore.collection('alarms').doc("${userEmail}_$alarmId").set(alarmData);
-
   }
 
   Future<int> _getLastAlarmId(String userEmail) async {

@@ -34,8 +34,28 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _loadAlarms();
+    listenForUpdates();
+
     subscription ??= Alarm.ringStream.stream.listen(navigateToRingScreen);
     checkAndRequestPermissions();
+  }
+
+  void listenForUpdates() {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final FirebaseAuth _auth = FirebaseAuth.instance;
+
+    // Listen for updates in the 'alarms' collection
+    String userEmail = _auth.currentUser!.email!;
+
+
+    _firestore
+        .collection('alarms')
+        .where('AlarmUsers', arrayContains: userEmail)
+        .snapshots()
+        .listen((snapshot) {
+      // If an update is detected, call the _loadAlarms function
+      _loadAlarms();
+    });
   }
 
   Future<void> checkAndRequestPermissions() async {
@@ -69,7 +89,6 @@ class _MyHomePageState extends State<MyHomePage> {
         .collection('alarms')
         .where('AlarmUsers', arrayContains: userEmail)
         .get();
-    print("HASAN + ${alarmsSnapshot.docs.length}");
     // For each document in the query result
     for (var doc in alarmsSnapshot.docs) {
       // Create an AlarmItem object with the data from the document
@@ -83,7 +102,6 @@ class _MyHomePageState extends State<MyHomePage> {
         soundLevel: doc['soundLevel'],
         isVibration: doc['isVibration'],
       );
-
       // Add the alarm to the local database
       await DatabaseHelper.instance.create(alarm);
     }
@@ -93,9 +111,15 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       alarms = dbAlarms.reversed.toList();
     });
+
+    for(var alarm in alarms) {
+      if (alarm.isActive) {
+        _scheduleAlarm(alarm, false);
+      } else {
+        _cancelAlarm(alarm.id!);
+      }
+    }
   }
-
-
 
   @override
   void dispose() {
@@ -126,7 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> _scheduleAlarm(AlarmItem alarm, bool isFromToggle) async {
+  Future<void> _scheduleAlarm(AlarmItem alarm, bool showToast) async {
     final alarmDateTimeToSet = TimeUtils.getClosestDateTimeInAlarm(alarm);
 
     final alarmSettings = AlarmSettings(
@@ -142,7 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
       enableNotificationOnKill: true,
     );
 
-    if (isFromToggle) {
+    if (showToast) {
       GeneralUtils.showClosestAlarmToastMessage(alarm);
     }
 

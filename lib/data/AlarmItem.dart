@@ -63,7 +63,7 @@ class AlarmItem {
           isVibration: isVibration ?? this.isVibration);
 
   static AlarmItem fromJson(Map<String, Object?> json) => AlarmItem(
-        id: json[AlarmFields.id] as int?,
+        id: stringToInt(json[AlarmFields.id] as String) as int?,
         name: json[AlarmFields.name] as String,
         time: json[AlarmFields.time] as String,
         daysActive: json[AlarmFields.daysActive] as String,
@@ -72,6 +72,10 @@ class AlarmItem {
         soundLevel: json[AlarmFields.soundLevel] as int,
         isVibration: json[AlarmFields.isVibration] == 1,
       );
+
+  static int stringToInt(String numberString) {
+    return int.parse(numberString);
+  }
 
   Map<String, Object?> toJson() => {
         AlarmFields.id: id,

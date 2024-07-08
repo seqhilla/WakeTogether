@@ -22,14 +22,14 @@ class DatabaseHelper {
   }
 
   Future _createDB(Database db, int version) async {
-    const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
+    const idType = 'INTEGER NOT NULL';
     const boolType = 'BOOLEAN NOT NULL';
     const textType = 'TEXT NOT NULL';
     const intType = 'INTEGER NOT NULL';
 
     await db.execute('''
           CREATE TABLE $tableAlarms (
-            ${AlarmFields.id} $idType,
+            ${AlarmFields.id} $textType,
             ${AlarmFields.name} $textType,
             ${AlarmFields.time} $textType,
             ${AlarmFields.daysActive} $textType,
