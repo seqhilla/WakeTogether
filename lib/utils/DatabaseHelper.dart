@@ -44,7 +44,6 @@ class DatabaseHelper {
 
   Future<AlarmItem> create(AlarmItem alarm) async {
     final db = await instance.database;
-
     final id = await db.insert(tableAlarms, alarm.toJson());
     return alarm.copy(id: id);
   }

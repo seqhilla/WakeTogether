@@ -27,15 +27,13 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<AlarmItem> alarms = [];
-
   static StreamSubscription<AlarmSettings>? subscription;
 
   @override
   void initState() {
     super.initState();
-    _loadAlarms();
+    //_loadAlarms();
     listenForUpdates();
-
     subscription ??= Alarm.ringStream.stream.listen(navigateToRingScreen);
     checkAndRequestPermissions();
   }
@@ -44,7 +42,6 @@ class _MyHomePageState extends State<MyHomePage> {
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final FirebaseAuth _auth = FirebaseAuth.instance;
 
-    // Listen for updates in the 'alarms' collection
     String userEmail = _auth.currentUser!.email!;
 
     _firestore
@@ -75,6 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _loadAlarms() async {
+    print('Loading alarms...');
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
     // Get the email of the current user

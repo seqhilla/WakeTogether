@@ -275,6 +275,7 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
 
   void saveOrUpdateTheAlarm(AlarmItem alarm) async {
     if (widget.isNew) {
+      print("Killyourself");
       await DatabaseHelper.instance.create(alarm);
     } else {
       await DatabaseHelper.instance.update(alarm);
