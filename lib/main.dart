@@ -21,39 +21,6 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
-void _loadAlarms() async {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  // Get the email of the current user
-  String userEmail = FirebaseAuth.instance.currentUser!.email!;
-
-  // Clear all alarms from the local database
-  await DatabaseHelper.instance.deleteAll();
-
-  // Query the 'alarms' collection in Firestore
-  final alarmsSnapshot = await _firestore
-      .collection('alarms')
-      .where('AlarmUsers', arrayContains: userEmail)
-      .get();
-  // For each document in the query result
-  for (var doc in alarmsSnapshot.docs) {
-    // Create an AlarmItem object with the data from the document
-    AlarmItem alarm = AlarmItem(
-      id:doc['id'],
-      name: doc['name'],
-      time: doc['time'],
-      daysActive: doc['daysActive'],
-      isActive: doc['isActive'],
-      isSingleAlarm: doc['isSingleAlarm'],
-      soundLevel: doc['soundLevel'],
-      isVibration: doc['isVibration'],
-    );
-
-    // Add the alarm to the local database
-    await DatabaseHelper.instance.create(alarm);
-  }
-}
-
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 

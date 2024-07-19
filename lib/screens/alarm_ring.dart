@@ -1,5 +1,6 @@
 import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:waketogether/data/AlarmItem.dart';
 import 'package:waketogether/utils/DatabaseHelper.dart';
@@ -120,7 +121,13 @@ class AlarmRingScreen extends StatelessWidget {
           isActive: false,
           isSingleAlarm: alarmItem.isSingleAlarm,
           soundLevel: alarmItem.soundLevel,
-          isVibration: alarmItem.isVibration);
+          isVibration: alarmItem.isVibration,
+          alarmUsers: alarmItem.alarmUsers
+      );
+      final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+      _firestore.collection('alarms').doc("${alarmItem.alarmUsers[0]}_${alarmItem.id}").update({
+        'isActive': false,
+      });
       DatabaseHelper.instance.update(alarm);
     }
 

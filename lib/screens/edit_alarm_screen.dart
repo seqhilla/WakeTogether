@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:waketogether/data/AlarmItem.dart';
-import 'package:waketogether/services/firestore_service.dart';
 import 'package:waketogether/utils/DatabaseHelper.dart';
 import 'package:waketogether/utils/TimeUtils.dart';
 
@@ -214,13 +213,10 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                   ElevatedButton(
                     onPressed: () async {
                       if (widget.initialAlarm.id != null) {
-                        // Delete the alarm from the local database
                         await DatabaseHelper.instance.delete(widget.initialAlarm.id!);
 
-                        // Get the email of the current user
                         String userEmail = FirebaseAuth.instance.currentUser!.email!;
 
-                        // Delete the alarm from Firestore
                         await _firestore.collection('alarms').doc("${userEmail}_${widget.initialAlarm.id}").delete();
                       }
                       Navigator.pop(context, true);
@@ -245,6 +241,7 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                       isSingleAlarm: isAlarmSingle,
                       soundLevel: _soundLevel,
                       isVibration: _isVibration,
+                      alarmUsers: widget.initialAlarm.alarmUsers,
                     );
                     saveOrUpdateTheAlarm(alarm);
                     GeneralUtils.showClosestAlarmToastMessage(alarm);
@@ -257,9 +254,9 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            if (widget.isNew) // Eğer alarm yeni ise 'Kullanıcıları Yönet' butonunu gizle ve yazıyı göster
+            if (widget.isNew)
               const Text('Alarmı oluşturduktan sonra kullanıcı ekleyebilirsiniz'),
-            if (!widget.isNew) // Eğer alarm yeni değilse yazıyı gizle ve 'Kullanıcıları Yönet' butonunu göster
+            if (!widget.isNew)
               Center(
                 child: ElevatedButton(
                   onPressed: () => Navigator.push(
@@ -319,20 +316,14 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
   Future<void> _saveOrUpdateAlarmToFirestore(AlarmItem alarm, String userEmail) async {
     int alarmId;
     if (alarm.id == null) {
-      // If this is a new alarm, get the last alarm ID and increment it by 1
       int lastAlarmId = await _getLastAlarmId(userEmail);
       alarmId = lastAlarmId + 1;
     } else {
-      // If this is an existing alarm, use its current ID
       alarmId = alarm.id!;
     }
     List<String> alarmUsers = [userEmail];
     if (!widget.isNew) {
-      DocumentSnapshot alarmSnapshot = await _firestore
-          .collection('alarms')
-          .doc('${userEmail}_${alarmId}')
-          .get();
-      alarmUsers = List<String>.from(alarmSnapshot['AlarmUsers']);
+      alarmUsers = alarm.alarmUsers;
     }
     final alarmData = {
       'id': alarmId,
@@ -347,7 +338,7 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
     };
 
     // Save the alarm data to the 'alarms' collection in Firestore
-    await _firestore.collection('alarms').doc("${userEmail}_$alarmId").set(alarmData);
+    await _firestore.collection('alarms').doc("${alarmUsers[0]}_$alarmId").set(alarmData);
   }
 
   Future<int> _getLastAlarmId(String userEmail) async {

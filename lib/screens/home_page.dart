@@ -47,7 +47,6 @@ class _MyHomePageState extends State<MyHomePage> {
     // Listen for updates in the 'alarms' collection
     String userEmail = _auth.currentUser!.email!;
 
-
     _firestore
         .collection('alarms')
         .where('AlarmUsers', arrayContains: userEmail)
@@ -81,19 +80,15 @@ class _MyHomePageState extends State<MyHomePage> {
     // Get the email of the current user
     String userEmail = FirebaseAuth.instance.currentUser!.email!;
 
-    // Clear all alarms from the local database
     await DatabaseHelper.instance.deleteAll();
 
-    // Query the 'alarms' collection in Firestore
     final alarmsSnapshot = await _firestore
         .collection('alarms')
         .where('AlarmUsers', arrayContains: userEmail)
         .get();
-    // For each document in the query result
     for (var doc in alarmsSnapshot.docs) {
-      // Create an AlarmItem object with the data from the document
       AlarmItem alarm = AlarmItem(
-        id:doc['id'],
+        id: doc['id'],
         name: doc['name'],
         time: doc['time'],
         daysActive: doc['daysActive'],
@@ -101,12 +96,11 @@ class _MyHomePageState extends State<MyHomePage> {
         isSingleAlarm: doc['isSingleAlarm'],
         soundLevel: doc['soundLevel'],
         isVibration: doc['isVibration'],
+        alarmUsers: listToString(doc['AlarmUsers']),
       );
-      // Add the alarm to the local database
       await DatabaseHelper.instance.create(alarm);
     }
 
-    // Reload alarms from the local database
     final dbAlarms = await DatabaseHelper.instance.readAllAlarms();
     setState(() {
       alarms = dbAlarms.reversed.toList();
@@ -119,6 +113,14 @@ class _MyHomePageState extends State<MyHomePage> {
         _cancelAlarm(alarm.id!);
       }
     }
+  }
+
+  List<String> listToString(List<dynamic> list) {
+    List<String> result = [];
+    for (var item in list) {
+      result.add(item.toString());
+    }
+    return result;
   }
 
   @override
@@ -136,7 +138,15 @@ class _MyHomePageState extends State<MyHomePage> {
         isActive: newValue,
         isSingleAlarm: alarms[index].isSingleAlarm,
         soundLevel: alarms[index].soundLevel,
-        isVibration: alarms[index].isVibration);
+        isVibration: alarms[index].isVibration,
+        alarmUsers: alarms[index].alarmUsers
+    );
+
+    //firestore'da da güncelle
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    _firestore.collection('alarms').doc("${alarms[index].alarmUsers[0]}_${ alarms[index].id}").update({
+      'isActive': newValue,
+    });
 
     await DatabaseHelper.instance.update(alarm);
     setState(() {
@@ -219,7 +229,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         isActive: true,
                         isSingleAlarm: true,
                         soundLevel: 80,
-                        isVibration: true),
+                        isVibration: true,
+                        alarmUsers: [],
+                    ),
                     isNew: true,
                   ),
                 ),

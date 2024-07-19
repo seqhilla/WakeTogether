@@ -35,14 +35,16 @@ class DatabaseHelper {
             ${AlarmFields.daysActive} $textType,
             ${AlarmFields.isActive} $boolType,
             ${AlarmFields.isSingleAlarm} $boolType,
-            ${AlarmFields.soundLevel} $intType,
-            ${AlarmFields.isVibration} $boolType
+            ${AlarmFields.soundLevel} $textType,
+            ${AlarmFields.isVibration} $boolType,
+            ${AlarmFields.alarmUsers} $textType
           )
         ''');
   }
 
   Future<AlarmItem> create(AlarmItem alarm) async {
     final db = await instance.database;
+
     final id = await db.insert(tableAlarms, alarm.toJson());
     return alarm.copy(id: id);
   }

@@ -21,4 +21,12 @@ class GeneralUtils {
 
     showToastMessage(TimeUtils.getHowManyTimeFromNow(dateTimeToShow));
   }
+
+  static int stringToInteger(String item) {
+    try {
+      return int.parse(item);
+    } catch (e) {
+      return 0;
+    }
+  }
 }

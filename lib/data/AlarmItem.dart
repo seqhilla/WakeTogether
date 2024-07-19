@@ -9,7 +9,8 @@ class AlarmFields {
     isActive,
     isSingleAlarm,
     soundLevel,
-    isVibration
+    isVibration,
+    alarmUsers
   ];
 
   static const String id = '_id';
@@ -20,6 +21,7 @@ class AlarmFields {
   static const String isSingleAlarm = 'isSingleAlarm';
   static const String soundLevel = 'soundLevel';
   static const String isVibration = 'isVibration';
+  static const String alarmUsers = 'alarmUsers';
 }
 
 class AlarmItem {
@@ -31,6 +33,7 @@ class AlarmItem {
   final bool? isSingleAlarm;
   final int soundLevel;
   final bool isVibration;
+  final List<String> alarmUsers;
 
   const AlarmItem({
     this.id,
@@ -41,6 +44,7 @@ class AlarmItem {
     this.isSingleAlarm,
     required this.soundLevel,
     required this.isVibration,
+    required this.alarmUsers,
   });
 
   AlarmItem copy(
@@ -51,7 +55,8 @@ class AlarmItem {
           bool? isActive,
           bool? isSingleAlarm,
           int? soundLevel,
-          bool? isVibration}) =>
+          bool? isVibration,
+          List<String>? alarmUsers}) =>
       AlarmItem(
           id: id ?? this.id,
           name: name ?? this.name,
@@ -60,7 +65,8 @@ class AlarmItem {
           isActive: isActive ?? this.isActive,
           isSingleAlarm: isSingleAlarm ?? this.isSingleAlarm,
           soundLevel: soundLevel ?? this.soundLevel,
-          isVibration: isVibration ?? this.isVibration);
+          isVibration: isVibration ?? this.isVibration,
+          alarmUsers: alarmUsers ?? this.alarmUsers);
 
   static AlarmItem fromJson(Map<String, Object?> json) => AlarmItem(
         id: stringToInt(json[AlarmFields.id] as String) as int?,
@@ -69,8 +75,9 @@ class AlarmItem {
         daysActive: json[AlarmFields.daysActive] as String,
         isActive: json[AlarmFields.isActive] == 1,
         isSingleAlarm: json[AlarmFields.isSingleAlarm] == 1,
-        soundLevel: json[AlarmFields.soundLevel] as int,
+        soundLevel: stringToInt(json[AlarmFields.soundLevel] as String),
         isVibration: json[AlarmFields.isVibration] == 1,
+        alarmUsers: (json[AlarmFields.alarmUsers] as String).split(','),
       );
 
   static int stringToInt(String numberString) {
@@ -86,6 +93,7 @@ class AlarmItem {
         AlarmFields.isSingleAlarm: handleIsSingleAlarm(isSingleAlarm),
         AlarmFields.soundLevel: soundLevel,
         AlarmFields.isVibration: isVibration ? 1 : 0,
+        AlarmFields.alarmUsers: alarmUsers.join(','),
       };
 
   int handleIsSingleAlarm(bool? isSingleAlarm) {
