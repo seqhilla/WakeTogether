@@ -1,3 +1,14 @@
 {
-  "sign_in": "Sign in"
+  "pre_login": {
+    "sign_in": "Sign in",
+    "sign_in_google": "Sign in with Google"
+  },
+  "add_user": {
+    "search_user": "Search User",
+    "enter_email": "Enter E-mail",
+    "self_request": "You cannot send request to yourself",
+    "existing_request": "Request already exists"
+    "request_sent": "Request sent to the user",
+    "user_not_found": "User not found"
+  }
 }
