@@ -76,7 +76,7 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
     );
   }
 
-  Future<void> _searchUser(String email AppLocalizations res) async {
+  Future<void> _searchUser(String email, AppLocalizations res) async {
     _printMatchingRequests(FirebaseAuth.instance.currentUser!.email!);
     final querySnapshot = await _firestore
         .collection('users')
