@@ -26,7 +26,7 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
   @override
   Widget build(BuildContext context) {
 
-    final res = GeneralUtils.resources(context).add_user;
+    final res = GeneralUtils.resources(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -42,7 +42,7 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
                 labelText: res.enter_email,
                 suffixIcon: IconButton(
                   icon: Icon(Icons.search),
-                  onPressed: () => _searchUser(_searchController.text),
+                  onPressed: () => _searchUser(_searchController.text, res),
                 ),
               ),
             ),
@@ -74,7 +74,7 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
     );
   }
 
-  Future<void> _searchUser(String email) async {
+  Future<void> _searchUser(String email AppLocalizations res) async {
     _printMatchingRequests(FirebaseAuth.instance.currentUser!.email!);
     final querySnapshot = await _firestore
         .collection('users')
