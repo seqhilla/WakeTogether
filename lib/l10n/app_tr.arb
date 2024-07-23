@@ -1,3 +1,13 @@
 {
-  "sign_in": "Giriş yap"
+ 
+  "sign_in": "Giriş yap",
+  "sign_in_google": "Google ile giriş yap",
+ 
+  "search_user": "Kullanıcı Ara",
+  "enter_email": "E-Posta adresi girin",
+  "self_request": "Kendi kullanıcınıza istek gönderemezsiniz",
+  "existing_request": "Aynı isimde istek var",
+  "request_sent": "Kullanıcıya istek gönderildi",
+  "user_not_found": "Kullanıcı bulunamadı"
+  
 }
