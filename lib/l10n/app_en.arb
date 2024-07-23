@@ -7,5 +7,30 @@
   "self_request": "You cannot send request to yourself",
   "existing_request": "Request already exists",
   "request_sent": "Request sent to the user",
-  "user_not_found": "User not found"
+  "user_not_found": "User not found",
+
+  "snooze": "Snooze:",
+  "one_min": "1 Min",
+  "ten_min": "10 Min",
+  "fifteen_min": "15 Min",
+  "thirty_min": "30 Min",
+
+  "mon": "M",
+  "tue": "T",
+  "wed": "W",
+  "thur": "T",
+  "fri": "F",
+  "sat": "S",
+  "sun": "S",
+  "alarm_name": "Alarm Name",
+  "volume": "Volume",
+  "vibration": "Vibration",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "save": "Save",
+  "add_before_alarm": "You can add users only after creating an alarm",
+  "manage_users": "Manage Users",
+  "tomorrow": "Tomorrow",
+  "today": "Today",
+  "every": "Every"
 }
