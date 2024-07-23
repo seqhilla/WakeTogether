@@ -8,7 +8,7 @@ import 'package:waketogether/utils/GeneralUtils.dart';
 class SearchUserScreen extends StatefulWidget {
   final int? alarmId;
 
-  SearchUserScreen({super.key, required this.alarmId});
+  const SearchUserScreen({super.key, required this.alarmId});
 
   @override
   _SearchUserScreenState createState() => _SearchUserScreenState();
@@ -17,7 +17,7 @@ class SearchUserScreen extends StatefulWidget {
 class _SearchUserScreenState extends State<SearchUserScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  List<Map<String, dynamic>> _searchResults = [];
+  final List<Map<String, dynamic>> _searchResults = [];
 
   @override
   void initState() {
@@ -40,10 +40,11 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               controller: _searchController,
+              onSubmitted: (value) => _searchUser(value, res),
               decoration: InputDecoration(
                 labelText: res.enter_email,
                 suffixIcon: IconButton(
-                  icon: Icon(Icons.search),
+                  icon: const Icon(Icons.search),
                   onPressed: () => _searchUser(_searchController.text, res),
                 ),
               ),
@@ -85,7 +86,7 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
 
     if (querySnapshot.docs.isNotEmpty) {
       String loggedInUserEmail = FirebaseAuth.instance.currentUser!.email!;
-      String docId = loggedInUserEmail + '_' + widget.alarmId.toString();
+      String docId = '${loggedInUserEmail}_${widget.alarmId}';
       final existingRequest = await _firestore.collection('requests').doc(docId).get();
       if (loggedInUserEmail == email) {
         Fluttertoast.showToast(msg: res.self_request);
@@ -110,15 +111,9 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
   }
 
   void _cancelRequest(int index) {
-    // Get the request to be cancelled
-    Map<String, dynamic> request = _searchResults[index];
+    String docId = '${FirebaseAuth.instance.currentUser!.email!}_${widget.alarmId}';
 
-    // Construct the document ID
-    String docId = FirebaseAuth.instance.currentUser!.email! + '_' + widget.alarmId.toString();
-
-    // Delete the request from Firestore
     _firestore.collection('requests').doc(docId).delete();
-    // Listeden isteği kaldır
     setState(() {
       _searchResults.removeAt(index);
     });
@@ -134,7 +129,7 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
   }
 
   Future<void> _printMatchingRequests(String senderEmail) async {
-    String docId = senderEmail + '_' + widget.alarmId.toString();
+    String docId = '${senderEmail}_${widget.alarmId}';
 
     final querySnapshot = await _firestore
         .collection('requests')
