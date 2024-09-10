@@ -8,6 +8,30 @@
   "self_request": "Kendi kullanıcınıza istek gönderemezsiniz",
   "existing_request": "Aynı isimde istek var",
   "request_sent": "Kullanıcıya istek gönderildi",
-  "user_not_found": "Kullanıcı bulunamadı"
-  
+  "user_not_found": "Kullanıcı bulunamadı",
+
+  "snooze": "Şu kadar ertele:",
+  "one_min": "1 Dk",
+  "ten_min": "10 Dk",
+  "fifteen_min": "15 Dk",
+  "thirty_min": "30 Dk",
+
+  "mon": "P",
+  "tue": "S",
+  "wed": "Ç",
+  "thur": "P",
+  "fri": "C",
+  "sat": "C",
+  "sun": "P",
+  "alarm_name": "Alarm Adı",
+  "volume": "Ses Seviyesi",
+  "vibration": "Titreşim",
+  "cancel": "İptal",
+  "delete": "Sil",
+  "save": "Kaydet",
+  "add_before_alarm": "Alarmı oluşturduktan sonra kullanıcı ekleyebilirsiniz",
+  "manage_users": "Kullanıcıları Yönet",
+  "tomorrow": "Yarın",
+  "today": "Bugün",
+  "every": "Her"
 }

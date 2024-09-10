@@ -9,6 +9,7 @@ import 'package:waketogether/utils/DatabaseHelper.dart';
 import '../data/AlarmRingStates.dart';
 import '../widgets/AlarmCancelButtonWidget.dart';
 import '../widgets/ClockWidget.dart';
+import 'package:waketogether/utils/GeneralUtils.dart';
 
 class AlarmRingScreen extends StatefulWidget {
   final AlarmSettings alarmSettings;
@@ -118,6 +119,9 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final res = GeneralUtils.resources(context);
+    counterToCancel(
+        context, 3); //TODO: Get from user
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -169,7 +173,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
                 child: PullAwayCancelWidget(onCancel: () {
                   safeStopTheAlarm(context);
                 })),
-            Text("Şu kadar ertele:",
+            Text(res.snooze,
                 style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 20),
             Row(
@@ -180,7 +184,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
                     onSnoozePressed(context, 1); // TODO: For snooze test this should be 5
                   },
                   child: Text(
-                    '1 Dk',
+                    res.one_min,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
@@ -189,7 +193,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
                     onSnoozePressed(context, 10);
                   },
                   child: Text(
-                    '10 Dk',
+                    res.ten_min,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
@@ -198,7 +202,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
                     onSnoozePressed(context, 15);
                   },
                   child: Text(
-                    '15 Dk',
+                    res.fifteen_min,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
@@ -207,7 +211,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
                     onSnoozePressed(context, 30);
                   },
                   child: Text(
-                    '30 Dk',
+                    res.thirty_min,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
