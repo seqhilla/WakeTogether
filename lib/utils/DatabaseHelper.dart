@@ -22,10 +22,8 @@ class DatabaseHelper {
   }
 
   Future _createDB(Database db, int version) async {
-    const idType = 'INTEGER NOT NULL';
     const boolType = 'BOOLEAN NOT NULL';
     const textType = 'TEXT NOT NULL';
-    const intType = 'INTEGER NOT NULL';
 
     await db.execute('''
           CREATE TABLE $tableAlarms (
@@ -37,7 +35,8 @@ class DatabaseHelper {
             ${AlarmFields.isSingleAlarm} $boolType,
             ${AlarmFields.soundLevel} $textType,
             ${AlarmFields.isVibration} $boolType,
-            ${AlarmFields.alarmUsers} $textType
+            ${AlarmFields.alarmUsers} $textType,
+            ${AlarmFields.alarmStates} $textType
           )
         ''');
   }

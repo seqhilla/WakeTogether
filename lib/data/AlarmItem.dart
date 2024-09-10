@@ -10,10 +10,9 @@ class AlarmFields {
     isSingleAlarm,
     soundLevel,
     isVibration,
-    alarmUsers
+    alarmUsers,
+    alarmStates,
   ];
-
-//deneme2222
 
   static const String id = '_id';
   static const String name = 'name';
@@ -24,6 +23,7 @@ class AlarmFields {
   static const String soundLevel = 'soundLevel';
   static const String isVibration = 'isVibration';
   static const String alarmUsers = 'alarmUsers';
+  static const String alarmStates = 'alarmStates';
 }
 
 class AlarmItem {
@@ -36,6 +36,7 @@ class AlarmItem {
   final int soundLevel;
   final bool isVibration;
   final List<String> alarmUsers;
+  final List<int> alarmStates;
 
   const AlarmItem({
     this.id,
@@ -47,56 +48,64 @@ class AlarmItem {
     required this.soundLevel,
     required this.isVibration,
     required this.alarmUsers,
+    required this.alarmStates,
   });
 
   AlarmItem copy(
-          {int? id,
-          String? name,
-          String? time,
-          String? daysActive,
-          bool? isActive,
-          bool? isSingleAlarm,
-          int? soundLevel,
-          bool? isVibration,
-          List<String>? alarmUsers}) =>
-      AlarmItem(
-          id: id ?? this.id,
-          name: name ?? this.name,
-          time: time ?? this.time,
-          daysActive: daysActive ?? this.daysActive,
-          isActive: isActive ?? this.isActive,
-          isSingleAlarm: isSingleAlarm ?? this.isSingleAlarm,
-          soundLevel: soundLevel ?? this.soundLevel,
-          isVibration: isVibration ?? this.isVibration,
-          alarmUsers: alarmUsers ?? this.alarmUsers);
+      {int? id,
+        String? name,
+        String? time,
+        String? daysActive,
+        bool? isActive,
+        bool? isSingleAlarm,
+        int? soundLevel,
+        bool? isVibration,
+        List<String>? alarmUsers,
+        List<int>? alarmStates}) =>
+  AlarmItem(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      time: time ?? this.time,
+      daysActive: daysActive ?? this.daysActive,
+      isActive: isActive ?? this.isActive,
+      isSingleAlarm: isSingleAlarm ?? this.isSingleAlarm,
+      soundLevel: soundLevel ?? this.soundLevel,
+      isVibration: isVibration ?? this.isVibration,
+      alarmUsers: alarmUsers ?? this.alarmUsers,
+      alarmStates: alarmStates ?? this.alarmStates);
 
   static AlarmItem fromJson(Map<String, Object?> json) => AlarmItem(
-        id: stringToInt(json[AlarmFields.id] as String) as int?,
-        name: json[AlarmFields.name] as String,
-        time: json[AlarmFields.time] as String,
-        daysActive: json[AlarmFields.daysActive] as String,
-        isActive: json[AlarmFields.isActive] == 1,
-        isSingleAlarm: json[AlarmFields.isSingleAlarm] == 1,
-        soundLevel: stringToInt(json[AlarmFields.soundLevel] as String),
-        isVibration: json[AlarmFields.isVibration] == 1,
-        alarmUsers: (json[AlarmFields.alarmUsers] as String).split(','),
-      );
+    id: stringToInt(json[AlarmFields.id] as String) as int?,
+    name: json[AlarmFields.name] as String,
+    time: json[AlarmFields.time] as String,
+    daysActive: json[AlarmFields.daysActive] as String,
+    isActive: json[AlarmFields.isActive] == 1,
+    isSingleAlarm: json[AlarmFields.isSingleAlarm] == 1,
+    soundLevel: stringToInt(json[AlarmFields.soundLevel] as String),
+    isVibration: json[AlarmFields.isVibration] == 1,
+    alarmUsers: (json[AlarmFields.alarmUsers] as String).split(','),
+    alarmStates: (json[AlarmFields.alarmStates] as String)
+        .split(',')
+        .map((str) => int.parse(str))
+        .toList(),
+  );
 
   static int stringToInt(String numberString) {
     return int.parse(numberString);
   }
 
   Map<String, Object?> toJson() => {
-        AlarmFields.id: id,
-        AlarmFields.name: name,
-        AlarmFields.time: time,
-        AlarmFields.daysActive: daysActive,
-        AlarmFields.isActive: isActive ? 1 : 0,
-        AlarmFields.isSingleAlarm: handleIsSingleAlarm(isSingleAlarm),
-        AlarmFields.soundLevel: soundLevel,
-        AlarmFields.isVibration: isVibration ? 1 : 0,
-        AlarmFields.alarmUsers: alarmUsers.join(','),
-      };
+    AlarmFields.id: id,
+    AlarmFields.name: name,
+    AlarmFields.time: time,
+    AlarmFields.daysActive: daysActive,
+    AlarmFields.isActive: isActive ? 1 : 0,
+    AlarmFields.isSingleAlarm: handleIsSingleAlarm(isSingleAlarm),
+    AlarmFields.soundLevel: soundLevel,
+    AlarmFields.isVibration: isVibration ? 1 : 0,
+    AlarmFields.alarmUsers: alarmUsers.join(','),
+    AlarmFields.alarmStates: alarmStates.join(','),
+  };
 
   int handleIsSingleAlarm(bool? isSingleAlarm) {
     if (isSingleAlarm == true) {

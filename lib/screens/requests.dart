@@ -68,11 +68,17 @@ class _RequestsPageState extends State<RequestsPage> {
     // Add the accepting user's email to the list
     alarmUsers.add(acceptingUserEmail);
 
-    // Update the 'AlarmUsers' field of the alarm
+    // Get the current list of alarm states
+    List<int> alarmStates = List<int>.from(alarmSnapshot['AlarmStates']);
+
+    // Add 99 to the alarm states
+    alarmStates.add(99);
+
+    // Update the 'AlarmUsers' and 'AlarmStates' field of the alarm
     await _firestore
         .collection('alarms')
         .doc('${request['from']}_${request['alarmId']}')
-        .update({'AlarmUsers': alarmUsers});
+        .update({'AlarmUsers': alarmUsers, 'AlarmStates': alarmStates});
 
     // Find the index of the request in the list
     int requestIndex = _requests.indexOf(request);

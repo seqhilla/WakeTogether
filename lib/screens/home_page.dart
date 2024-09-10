@@ -95,6 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
         soundLevel: doc['soundLevel'],
         isVibration: doc['isVibration'],
         alarmUsers: listToString(doc['AlarmUsers']),
+        alarmStates: listToInt(doc['AlarmStates']),
       );
       await DatabaseHelper.instance.create(alarm);
     }
@@ -121,6 +122,14 @@ class _MyHomePageState extends State<MyHomePage> {
     return result;
   }
 
+  List<int> listToInt(List<dynamic> list) {
+    List<int> result = [];
+    for (var item in list) {
+      result.add(item as int);
+    }
+    return result;
+  }
+
   @override
   void dispose() {
     subscription?.cancel();
@@ -137,7 +146,8 @@ class _MyHomePageState extends State<MyHomePage> {
         isSingleAlarm: alarms[index].isSingleAlarm,
         soundLevel: alarms[index].soundLevel,
         isVibration: alarms[index].isVibration,
-        alarmUsers: alarms[index].alarmUsers
+        alarmUsers: alarms[index].alarmUsers,
+        alarmStates: alarms[index].alarmStates
     );
 
     //firestore'da da güncelle
@@ -159,6 +169,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _scheduleAlarm(AlarmItem alarm, bool showToast) async {
+    //updateAlarmStateForCurrentUser(alarm, 3); //Alarm is setted
     final alarmDateTimeToSet = TimeUtils.getClosestDateTimeInAlarm(alarm);
 
     final alarmSettings = AlarmSettings(
@@ -182,6 +193,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _cancelAlarm(int alarmId) async {
+    /*
+    AlarmItem? alarmItem =
+    await DatabaseHelper.instance.findAlarmItem(alarmId);
+    if (alarmItem != null) {
+      updateAlarmStateForCurrentUser(alarmItem, 4); //Alarm is cancelled
+    }
+     */
     await Alarm.stop(alarmId);
   }
 
@@ -200,6 +218,30 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       );
       _loadAlarms();
+    }
+  }
+
+  void updateAlarmStateForCurrentUser(AlarmItem alarmItem, int state) async {
+    String currentUserEmail = FirebaseAuth.instance.currentUser!.email!;
+    DocumentSnapshot alarmSnapshot = await FirebaseFirestore.instance
+        .collection('alarms')
+        .doc("${alarmItem.alarmUsers[0]}_${alarmItem.id}")
+        .get();
+
+    if (alarmSnapshot.exists) {
+      Map<String, dynamic> data = alarmSnapshot.data() as Map<String, dynamic>;
+      List<String> alarmUsers = List<String>.from(data['AlarmUsers']);
+      List<int> alarmStates = List<int>.from(data['AlarmStates']);
+
+      int userIndex = alarmUsers.indexOf(currentUserEmail);
+      if (userIndex != -1) {
+        alarmStates[userIndex] = state;
+
+        await FirebaseFirestore.instance
+            .collection('alarms')
+            .doc("${alarmItem.alarmUsers[0]}_${alarmItem.id}")
+            .update({'AlarmStates': alarmStates});
+      }
     }
   }
 
@@ -229,6 +271,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         soundLevel: 80,
                         isVibration: true,
                         alarmUsers: [],
+                        alarmStates: []
                     ),
                     isNew: true,
                   ),

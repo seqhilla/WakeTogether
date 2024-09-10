@@ -242,6 +242,7 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                       soundLevel: _soundLevel,
                       isVibration: _isVibration,
                       alarmUsers: widget.initialAlarm.alarmUsers,
+                      alarmStates: widget.initialAlarm.alarmStates
                     );
                     saveOrUpdateTheAlarm(alarm);
                     GeneralUtils.showClosestAlarmToastMessage(alarm);
@@ -275,7 +276,6 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
 
   void saveOrUpdateTheAlarm(AlarmItem alarm) async {
     if (widget.isNew) {
-      print("Killyourself");
       await DatabaseHelper.instance.create(alarm);
     } else {
       await DatabaseHelper.instance.update(alarm);
@@ -285,17 +285,14 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
   String getDateText() {
     String textToReturn = "";
 
-    // Check if all elements in _daysActive are false
     if (_daysActive.every((day) => day == false)) {
       final now = DateTime.now();
       final alarmTimeToday = DateTime(now.year, now.month, now.day,
           _selectedTime.hour, _selectedTime.minute);
       if (now.isAfter(alarmTimeToday)) {
-        // The alarm is set for tomorrow
         final tomorrow = DateTime(now.year, now.month, now.day + 1);
         textToReturn = "Yarın - ${TimeUtils.getDayMonth(tomorrow)}";
       } else {
-        // The alarm is set for today
         textToReturn = "Bugün - ${TimeUtils.getDayMonth(now)}";
       }
     } else {
@@ -304,7 +301,6 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
           textToReturn += "${TimeUtils.getShortDayName(i + 1)}, ";
         }
       }
-      // Remove the trailing comma
       if (textToReturn.endsWith(",")) {
         textToReturn = textToReturn.substring(0, textToReturn.length - 1);
       }
@@ -323,8 +319,10 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
       alarmId = alarm.id!;
     }
     List<String> alarmUsers = [userEmail];
+    List<int> alarmStates = [99];
     if (!widget.isNew) {
       alarmUsers = alarm.alarmUsers;
+      alarmStates = alarm.alarmStates;
     }
     final alarmData = {
       'id': alarmId,
@@ -335,10 +333,10 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
       'isSingleAlarm': alarm.isSingleAlarm,
       'soundLevel': alarm.soundLevel,
       'isVibration': alarm.isVibration,
-      'AlarmUsers': alarmUsers, // Add the AlarmUsers field
+      'AlarmUsers': alarmUsers,
+      'AlarmStates': alarmStates,
     };
 
-    // Save the alarm data to the 'alarms' collection in Firestore
     await _firestore.collection('alarms').doc("${alarmUsers[0]}_$alarmId").set(alarmData);
   }
 
