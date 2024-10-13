@@ -84,9 +84,19 @@ class _MyHomePageState extends State<MyHomePage> {
         .collection('alarms')
         .where('AlarmUsers', arrayContains: userEmail)
         .get();
+    var previousID = -1;
     for (var doc in alarmsSnapshot.docs) {
+      var id = doc['id'];
+      if (previousID == -1) {
+        previousID = id;
+        print("Hello");
+      } else if (previousID == id) {
+        print("FROM");
+        continue;
+      }
+      print("ALARMALARM");
       AlarmItem alarm = AlarmItem(
-        id: doc['id'],
+        id: id,
         name: doc['name'],
         time: doc['time'],
         daysActive: doc['daysActive'],
@@ -107,6 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     for(var alarm in alarms) {
       if (alarm.isActive) {
+        print("Hasasn");
         _scheduleAlarm(alarm, false);
       } else {
         _cancelAlarm(alarm.id!);
@@ -162,6 +173,8 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     if (newValue) {
+      print("gezer");
+
       _scheduleAlarm(alarm, true);
     } else {
       _cancelAlarm(alarm.id!);
@@ -169,6 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _scheduleAlarm(AlarmItem alarm, bool showToast) async {
+    print("EKMEK");
     //updateAlarmStateForCurrentUser(alarm, 3); //Alarm is setted
     final alarmDateTimeToSet = TimeUtils.getClosestDateTimeInAlarm(alarm);
 
