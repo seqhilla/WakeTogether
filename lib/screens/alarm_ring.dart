@@ -15,7 +15,7 @@ class AlarmRingScreen extends StatefulWidget {
   final AlarmSettings alarmSettings;
   final AlarmItem alarmItem;
 
-  AlarmRingScreen({
+  const AlarmRingScreen({
     required this.alarmSettings,
     required this.alarmItem,
     super.key,
@@ -107,8 +107,8 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
           alarmUsers: widget.alarmItem.alarmUsers,
           alarmStates: widget.alarmItem.alarmStates
       );
-      final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-      _firestore.collection('alarms').doc("${widget.alarmItem.alarmUsers[0]}_${widget.alarmItem.id}").update({
+      final FirebaseFirestore firestore = FirebaseFirestore.instance;
+      firestore.collection('alarms').doc("${widget.alarmItem.alarmUsers[0]}_${widget.alarmItem.id}").update({
         'isActive': false,
       });
       DatabaseHelper.instance.update(alarm);

@@ -29,8 +29,7 @@ class TimeProvider extends ChangeNotifier {
 class CustomTimePicker extends StatelessWidget {
   final ValueChanged<TimeOfDay> onTimeChanged;
 
-  const CustomTimePicker({Key? key, required this.onTimeChanged})
-      : super(key: key);
+  const CustomTimePicker({super.key, required this.onTimeChanged});
 
   @override
   Widget build(BuildContext context) {

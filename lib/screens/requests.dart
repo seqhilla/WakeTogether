@@ -3,13 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class RequestsPage extends StatefulWidget {
+  const RequestsPage({super.key});
+
   @override
   _RequestsPageState createState() => _RequestsPageState();
 }
 
 class _RequestsPageState extends State<RequestsPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  List<Map<String, dynamic>> _requests = [];
+  final List<Map<String, dynamic>> _requests = [];
 
 
   @override
@@ -106,7 +108,7 @@ class _RequestsPageState extends State<RequestsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Gelen İstekler'),
+        title: const Text('Gelen İstekler'),
       ),
       body: ListView.builder(
         itemCount: _requests.length,
@@ -117,11 +119,11 @@ class _RequestsPageState extends State<RequestsPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  icon: Icon(Icons.check),
+                  icon: const Icon(Icons.check),
                   onPressed: () => _acceptRequest(_requests[index]),
                 ),
                 IconButton(
-                  icon: Icon(Icons.close),
+                  icon: const Icon(Icons.close),
                   onPressed: () => _rejectRequest(_requests[index]),
                 ),
               ],

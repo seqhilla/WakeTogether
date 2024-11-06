@@ -26,7 +26,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Widget _defaultHome = SignInPage();
+  Widget _defaultHome = const SignInPage();
 
   @override
   void initState() {
@@ -34,7 +34,7 @@ class _MyAppState extends State<MyApp> {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user == null) {
         setState(() {
-          _defaultHome = SignInPage();
+          _defaultHome = const SignInPage();
         });
       } else {
         setState(() {

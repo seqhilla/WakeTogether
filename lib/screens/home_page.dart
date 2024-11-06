@@ -39,12 +39,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void listenForUpdates() {
-    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-    final FirebaseAuth _auth = FirebaseAuth.instance;
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final FirebaseAuth auth = FirebaseAuth.instance;
 
-    String userEmail = _auth.currentUser!.email!;
+    String userEmail = auth.currentUser!.email!;
 
-    _firestore
+    firestore
         .collection('alarms')
         .where('AlarmUsers', arrayContains: userEmail)
         .snapshots()
@@ -73,14 +73,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _loadAlarms() async {
     print('Loading alarms...');
-    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     // Get the email of the current user
     String userEmail = FirebaseAuth.instance.currentUser!.email!;
 
     await DatabaseHelper.instance.deleteAll();
 
-    final alarmsSnapshot = await _firestore
+    final alarmsSnapshot = await firestore
         .collection('alarms')
         .where('AlarmUsers', arrayContains: userEmail)
         .get();
@@ -162,8 +162,8 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
     //firestore'da da güncelle
-    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-    _firestore.collection('alarms').doc("${alarms[index].alarmUsers[0]}_${ alarms[index].id}").update({
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    firestore.collection('alarms').doc("${alarms[index].alarmUsers[0]}_${ alarms[index].id}").update({
       'isActive': newValue,
     });
 
@@ -302,7 +302,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => RequestsPage(),
+                  builder: (context) => const RequestsPage(),
                 ),
               );
             },

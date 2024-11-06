@@ -1,12 +1,9 @@
-import 'package:flutter/animation.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PullAwayCancelWidget extends StatefulWidget {
   final VoidCallback onCancel;
 
-  const PullAwayCancelWidget({required this.onCancel, Key? key})
-      : super(key: key);
+  const PullAwayCancelWidget({required this.onCancel, super.key});
 
   @override
   _PullAwayCancelWidgetState createState() => _PullAwayCancelWidgetState();
@@ -53,7 +50,7 @@ class _PullAwayCancelWidgetState extends State<PullAwayCancelWidget>
               animation: _animationController,
               builder: (context, child) {
                 return AnimatedContainer(
-                  duration: Duration(milliseconds: 200),
+                  duration: const Duration(milliseconds: 200),
                   width: 80 + (_animationController.value * 70),
                   height: 80 + (_animationController.value * 70),
                   decoration: BoxDecoration(
@@ -72,7 +69,7 @@ class _PullAwayCancelWidgetState extends State<PullAwayCancelWidget>
                   alignment: Alignment.center,
                   children: [
                     AnimatedContainer(
-                      duration: Duration(milliseconds: 200),
+                      duration: const Duration(milliseconds: 200),
                       width: 250,
                       height: 250,
                       decoration: BoxDecoration(

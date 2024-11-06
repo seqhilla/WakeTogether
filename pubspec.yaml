@@ -51,6 +51,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   cloud_firestore: ^5.0.2
 
+  flutter_gen: any
 dev_dependencies:
   flutter_launcher_icons: ^0.9.2
   flutter_test:
