@@ -28,11 +28,11 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
   @override
   Widget build(BuildContext context) {
 
-    //final res = GeneralUtils.resources(context);
+    final res = GeneralUtils.resources(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("res.search_user"),
+        title: Text(res.search_user),
       ),
       body: Column(
         children: [
@@ -42,7 +42,7 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
               controller: _searchController,
               onSubmitted: (value) => _searchUser(value),
               decoration: InputDecoration(
-                labelText: "res.enter_email",
+                labelText: res.enter_email,
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.search),
                   onPressed: () => _searchUser(_searchController.text),
