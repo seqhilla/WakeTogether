@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:waketogether/screens/home_page.dart';
 import 'package:waketogether/screens/pre_login_screen.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,7 +52,7 @@ class _MyAppState extends State<MyApp> {
         useMaterial3: true,
       ),
       localizationsDelegates: const [
-        AppLocalizations.delegate,
+        //AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,

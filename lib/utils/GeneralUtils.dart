@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+//import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../data/AlarmItem.dart';
 import 'TimeUtils.dart';
@@ -30,9 +30,11 @@ class GeneralUtils {
       return 0;
     }
   }
-
+/*
   static AppLocalizations resources(BuildContext context) {
     return AppLocalizations.of(context)!;
   }
+
+ */
 
 }
