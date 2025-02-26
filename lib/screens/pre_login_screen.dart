@@ -65,11 +65,11 @@ class _SignInPageState extends State<SignInPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("res.sign_in"),
+        title: Text("Sign In"), //TODO: Furkan burayı yap
       ),
       body: Center(
         child: ElevatedButton(
-          child: Text("res.sign_in_google"), //TODO: Furkan burayı yap
+          child: Text("asdasdd"), //TODO: Furkan burayı yap
           onPressed: () {
             _handleSignIn()
                 .then((UserCredential? user) => print(user))
