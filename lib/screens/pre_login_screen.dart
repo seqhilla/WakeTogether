@@ -61,15 +61,15 @@ class _SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
 
-    final res = GeneralUtils.resources(context);
+    //final res = GeneralUtils.resources(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(res.sign_in),
+        title: Text("res.sign_in"),
       ),
       body: Center(
         child: ElevatedButton(
-          child: Text(res.sign_in_google),
+          child: Text("res.sign_in_google"), //TODO: Furkan burayı yap
           onPressed: () {
             _handleSignIn()
                 .then((UserCredential? user) => print(user))
