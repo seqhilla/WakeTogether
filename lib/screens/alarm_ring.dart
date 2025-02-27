@@ -119,7 +119,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //final res = GeneralUtils.resources(context);
+    final res = GeneralUtils.resources(context);
     counterToCancel(
         context, 3); //TODO: Get from user
     return Scaffold(
@@ -173,7 +173,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
                 child: PullAwayCancelWidget(onCancel: () {
                   safeStopTheAlarm(context);
                 })),
-            Text("res.snooze",
+            Text(res.snooze,
                 style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 20),
             Row(
@@ -184,7 +184,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
                     onSnoozePressed(context, 1); // TODO: For snooze test this should be 5
                   },
                   child: Text(
-                    "res.one_min",
+                    res.one_min,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
@@ -193,7 +193,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
                     onSnoozePressed(context, 10);
                   },
                   child: Text(
-                    "res.ten_min",
+                    res.ten_min,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
@@ -202,7 +202,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
                     onSnoozePressed(context, 15);
                   },
                   child: Text(
-                    "res.fifteen_min",
+                    res.fifteen_min,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
@@ -211,7 +211,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
                     onSnoozePressed(context, 30);
                   },
                   child: Text(
-                    "res.thirty_min",
+                    res.thirty_min,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
