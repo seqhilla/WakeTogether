@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "437090885039",
     "project_id": "waketogether-d3561",
-    "storage_bucket": "waketogether-d3561.appspot.com"
+    "storage_bucket": "waketogether-d3561.firebasestorage.app"
   },
   "client": [
     {
@@ -13,6 +13,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "437090885039-shvai42gstmcprtjpaiqk89745qkjhev.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.seqhilla.waketogether",
+            "certificate_hash": "60e85107b2f60c601f2bf8b07fffd5a6f87e008b"
+          }
+        },
         {
           "client_id": "437090885039-ci9if9vni9racgagf4dg9p547433ct3n.apps.googleusercontent.com",
           "client_type": 3
@@ -29,6 +37,13 @@
             {
               "client_id": "437090885039-ci9if9vni9racgagf4dg9p547433ct3n.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "437090885039-57ak0tj8a8lmf08ma7jm87rppno2cahm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.seqhilla.waketogether"
+              }
             }
           ]
         }
