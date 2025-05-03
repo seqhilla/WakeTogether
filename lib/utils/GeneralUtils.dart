@@ -35,6 +35,4 @@ class GeneralUtils {
     return AppLocalizations.of(context)!;
   }
 
-
-
 }
