@@ -248,7 +248,6 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                     GeneralUtils.showClosestAlarmToastMessage(alarm);
                     String loggedInUserEmail = FirebaseAuth.instance.currentUser!.email!;
                     _saveOrUpdateAlarmToFirestore(alarm, loggedInUserEmail);
-                    Navigator.pop(context, true);
                   },
                   child: const Text('Kaydet'),
                 ),
@@ -338,6 +337,7 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
     };
 
     await _firestore.collection('alarms').doc("${alarmUsers[0]}_$alarmId").set(alarmData);
+    Navigator.pop(context, true);
   }
 
   Future<int> _getLastAlarmId(String userEmail) async {

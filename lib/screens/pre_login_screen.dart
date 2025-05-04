@@ -25,7 +25,7 @@ class _SignInPageState extends State<SignInPage> {
         await userDoc.set({
           'uid': user.uid,
           'email': user.email, //TODO şuanlık email kullanılıyor nickname vb bir şey bul
-          // Add other user properties
+          // Add other user properties //TODO: Buraya değil ama bir yere loglout konsa iyi olur
         });
       }
     }

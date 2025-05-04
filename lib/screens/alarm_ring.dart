@@ -36,6 +36,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
     updateAlarmStateForCurrentUser(0); // Alarm is ringing
     listenForUpdates();
     counterToCancel(context, 50); // TODO: Get from user
+    //TODO: BİLDİRİM PERMISSION'I ISRARLA SOR
   }
 
   @override
