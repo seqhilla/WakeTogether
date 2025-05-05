@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-//import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:waketogether/utils/GeneralUtils.dart';
 
 class SearchUserScreen extends StatefulWidget {
@@ -76,8 +76,8 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
       ),
     );
   }
-//, AppLocalizations res
   Future<void> _searchUser(String email) async {
+    AppLocalizations res = GeneralUtils.resources(context);
     _printMatchingRequests(FirebaseAuth.instance.currentUser!.email!);
     final querySnapshot = await _firestore
         .collection('users')
@@ -89,14 +89,14 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
       String docId = '${loggedInUserEmail}_${widget.alarmId}';
       final existingRequest = await _firestore.collection('requests').doc(docId).get();
       if (loggedInUserEmail == email) {
-      //  Fluttertoast.showToast(msg: res.self_request);
+        Fluttertoast.showToast(msg: res.self_request);
         return;
       } else if (existingRequest.exists) {
-        //  Fluttertoast.showToast(msg: res.existing_request);
+          Fluttertoast.showToast(msg: res.existing_request);
         return;
       } else {
-        //  Fluttertoast.showToast(msg: res.request_sent);
         await _sendRequest(loggedInUserEmail, email, docId);
+        Fluttertoast.showToast(msg: res.request_sent);
         setState(() {
           _searchResults.add({
             'email': querySnapshot.docs.first['email'],
@@ -105,7 +105,7 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
         });
       }
     } else {
-      //  Fluttertoast.showToast(msg: res.user_not_found);
+        Fluttertoast.showToast(msg: res.user_not_found);
     }
     _searchController.clear();
   }

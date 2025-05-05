@@ -173,8 +173,6 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     if (newValue) {
-      print("gezer");
-
       _scheduleAlarm(alarm, true);
     } else {
       _cancelAlarm(alarm.id!);
@@ -182,7 +180,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _scheduleAlarm(AlarmItem alarm, bool showToast) async {
-    print("EKMEK");
     //updateAlarmStateForCurrentUser(alarm, 3); //Alarm is setted
     final alarmDateTimeToSet = TimeUtils.getClosestDateTimeInAlarm(alarm);
 

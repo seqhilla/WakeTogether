@@ -47,12 +47,6 @@ class _RequestsPageState extends State<RequestsPage> {
     // Get the email of the accepting user
     String acceptingUserEmail = FirebaseAuth.instance.currentUser!.email!;
 
-    // Add the alarm to the accepting user's alarms
-    await _firestore.collection('alarms').add({
-      'alarmId': request['alarmId'],
-      'email': acceptingUserEmail,
-    });
-
     // Update the 'isAccepted' field of the request
     await _firestore.collection('requests').doc(request['docId']).update({
       'isAccepted': true,
@@ -74,7 +68,7 @@ class _RequestsPageState extends State<RequestsPage> {
     List<int> alarmStates = List<int>.from(alarmSnapshot['AlarmStates']);
 
     // Add 99 to the alarm states
-    alarmStates.add(99);
+    alarmStates.add(99); // Alarm state 99 = alarmUnknown
 
     // Update the 'AlarmUsers' and 'AlarmStates' field of the alarm
     await _firestore

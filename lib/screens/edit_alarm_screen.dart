@@ -317,12 +317,20 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
     } else {
       alarmId = alarm.id!;
     }
+
     List<String> alarmUsers = [userEmail];
     List<int> alarmStates = [99];
+
     if (!widget.isNew) {
-      alarmUsers = alarm.alarmUsers;
-      alarmStates = alarm.alarmStates;
+      final docRef = _firestore.collection('alarms').doc("${alarm.alarmUsers[0]}_${alarm.id}");
+      final docSnap = await docRef.get();
+
+      if (docSnap.exists) {
+        alarmUsers = List<String>.from(docSnap.data()?['AlarmUsers'] ?? []);
+        alarmStates = List<int>.from(docSnap.data()?['AlarmStates'] ?? []);
+      }
     }
+
     final alarmData = {
       'id': alarmId,
       'name': alarm.name,
