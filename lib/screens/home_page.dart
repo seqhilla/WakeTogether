@@ -72,7 +72,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _loadAlarms() async {
-    print('Loading alarms...');
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     // Get the email of the current user
@@ -89,12 +88,9 @@ class _MyHomePageState extends State<MyHomePage> {
       var id = doc['id'];
       if (previousID == -1) {
         previousID = id;
-        print("Hello");
       } else if (previousID == id) {
-        print("FROM");
         continue;
       }
-      print("ALARMALARM");
       AlarmItem alarm = AlarmItem(
         id: id,
         name: doc['name'],
@@ -117,7 +113,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
     for(var alarm in alarms) {
       if (alarm.isActive) {
-        print("Hasasn");
         _scheduleAlarm(alarm, false);
       } else {
         _cancelAlarm(alarm.id!);

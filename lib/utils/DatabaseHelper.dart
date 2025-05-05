@@ -67,7 +67,6 @@ class DatabaseHelper {
     final db = await instance.database;
     const orderBy = '${AlarmFields.time} ASC';
     final result = await db.query(tableAlarms, orderBy: orderBy);
-    print("GURKAN: ${result}");
     return result.map((json) => AlarmItem.fromJson(json)).toList();
   }
 
