@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:waketogether/data/AlarmItem.dart';
-import 'package:waketogether/utils/DatabaseHelper.dart';
 import '../data/AlarmRingStates.dart';
 import '../widgets/AlarmCancelButtonWidget.dart';
 import '../widgets/ClockWidget.dart';
@@ -112,7 +111,6 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
       firestore.collection('alarms').doc("${widget.alarmItem.alarmUsers[0]}_${widget.alarmItem.id}").update({
         'isActive': false,
       });
-      DatabaseHelper.instance.update(alarm);
     }
 
     Alarm.stop(widget.alarmSettings.id).then((_) => Navigator.pop(context));

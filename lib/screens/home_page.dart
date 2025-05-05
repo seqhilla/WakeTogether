@@ -9,7 +9,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:waketogether/screens/requests.dart';
 
 import '../data/AlarmItem.dart';
-import '../utils/DatabaseHelper.dart';
 import '../utils/GeneralUtils.dart';
 import '../utils/TimeUtils.dart';
 import '../widgets/alarm_card.dart';
@@ -73,16 +72,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _loadAlarms() async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-    // Get the email of the current user
     String userEmail = FirebaseAuth.instance.currentUser!.email!;
-
-    await DatabaseHelper.instance.deleteAll();
+    List<AlarmItem> tempAlarms = [];
 
     final alarmsSnapshot = await firestore
         .collection('alarms')
         .where('AlarmUsers', arrayContains: userEmail)
         .get();
+
     var previousID = -1;
     for (var doc in alarmsSnapshot.docs) {
       var id = doc['id'];
@@ -91,6 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
       } else if (previousID == id) {
         continue;
       }
+
       AlarmItem alarm = AlarmItem(
         id: id,
         name: doc['name'],
@@ -103,12 +101,12 @@ class _MyHomePageState extends State<MyHomePage> {
         alarmUsers: listToString(doc['AlarmUsers']),
         alarmStates: listToInt(doc['AlarmStates']),
       );
-      await DatabaseHelper.instance.create(alarm);
+
+      tempAlarms.add(alarm);
     }
 
-    final dbAlarms = await DatabaseHelper.instance.readAllAlarms();
     setState(() {
-      alarms = dbAlarms.reversed.toList();
+      alarms = tempAlarms.reversed.toList();
     });
 
     for(var alarm in alarms) {
@@ -162,7 +160,6 @@ class _MyHomePageState extends State<MyHomePage> {
       'isActive': newValue,
     });
 
-    await DatabaseHelper.instance.update(alarm);
     setState(() {
       alarms[index] = alarm;
     });
@@ -210,23 +207,52 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> navigateToRingScreen(AlarmSettings alarmSettings) async {
-    AlarmItem? alarmItem =
-        await DatabaseHelper.instance.findAlarmItem(alarmSettings.id);
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    String userEmail = FirebaseAuth.instance.currentUser!.email!;
 
-    alarmItem ??= await DatabaseHelper.instance.findAlarmItem(alarmSettings.id - 10000); //if from snooze this is gonna work
+    // Önce normal alarm ID'si ile kontrol
+    var alarmSnapshot = await firestore
+        .collection('alarms')
+        .where('id', isEqualTo: alarmSettings.id)
+        .where('AlarmUsers', arrayContains: userEmail)
+        .get();
 
-    if (alarmItem != null) {
+    // Eğer bulunamazsa snooze ID'si ile kontrol
+    if (alarmSnapshot.docs.isEmpty) {
+      alarmSnapshot = await firestore
+          .collection('alarms')
+          .where('id', isEqualTo: alarmSettings.id - 10000)
+          .where('AlarmUsers', arrayContains: userEmail)
+          .get();
+    }
+    //TODO : Abi bu işi siktir git generic bir yerde yap amk her seferinde bu dönüşümle uğraşma
+    if (alarmSnapshot.docs.isNotEmpty) {
+      var doc = alarmSnapshot.docs.first;
+      AlarmItem alarmItem = AlarmItem(
+        id: doc['id'],
+        name: doc['name'],
+        time: doc['time'],
+        daysActive: doc['daysActive'],
+        isActive: doc['isActive'],
+        isSingleAlarm: doc['isSingleAlarm'],
+        soundLevel: doc['soundLevel'],
+        isVibration: doc['isVibration'],
+        alarmUsers: listToString(doc['AlarmUsers']),
+        alarmStates: listToInt(doc['AlarmStates']),
+      );
+
       await Navigator.push(
         context,
         MaterialPageRoute<void>(
           builder: (context) => AlarmRingScreen(
-              alarmSettings: alarmSettings, alarmItem: alarmItem!),
+            alarmSettings: alarmSettings,
+            alarmItem: alarmItem,
+          ),
         ),
       );
       _loadAlarms();
     }
   }
-
   void updateAlarmStateForCurrentUser(AlarmItem alarmItem, int state) async {
     String currentUserEmail = FirebaseAuth.instance.currentUser!.email!;
     DocumentSnapshot alarmSnapshot = await FirebaseFirestore.instance

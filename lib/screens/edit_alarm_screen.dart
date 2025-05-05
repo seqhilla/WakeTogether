@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:waketogether/data/AlarmItem.dart';
-import 'package:waketogether/utils/DatabaseHelper.dart';
 import 'package:waketogether/utils/TimeUtils.dart';
 
 import '../utils/GeneralUtils.dart';
@@ -213,8 +212,6 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                   ElevatedButton(
                     onPressed: () async {
                       if (widget.initialAlarm.id != null) {
-                        await DatabaseHelper.instance.delete(widget.initialAlarm.id!);
-
                         String userEmail = FirebaseAuth.instance.currentUser!.email!;
 
                         await _firestore.collection('alarms').doc("${userEmail}_${widget.initialAlarm.id}").delete();
@@ -244,7 +241,6 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                       alarmUsers: widget.initialAlarm.alarmUsers,
                       alarmStates: widget.initialAlarm.alarmStates
                     );
-                    saveOrUpdateTheAlarm(alarm);
                     GeneralUtils.showClosestAlarmToastMessage(alarm);
                     String loggedInUserEmail = FirebaseAuth.instance.currentUser!.email!;
                     _saveOrUpdateAlarmToFirestore(alarm, loggedInUserEmail);
@@ -271,14 +267,6 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
         ),
       ),
     );
-  }
-
-  void saveOrUpdateTheAlarm(AlarmItem alarm) async {
-    if (widget.isNew) {
-      await DatabaseHelper.instance.create(alarm);
-    } else {
-      await DatabaseHelper.instance.update(alarm);
-    }
   }
 
   String getDateText() {
