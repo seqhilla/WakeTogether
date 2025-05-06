@@ -23,6 +23,7 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
   void initState() {
     super.initState();
     _printMatchingRequests(FirebaseAuth.instance.currentUser!.email!);
+    _listenForUpdates();
   }
 
   @override
@@ -110,12 +111,43 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
     _searchController.clear();
   }
 
-  void _cancelRequest(int index) {
-    String docId = '${FirebaseAuth.instance.currentUser!.email!}_${widget.alarmId}';
+  void _cancelRequest(int index) async {
+    String currentUserEmail = FirebaseAuth.instance.currentUser!.email!;
+    String docId = '${currentUserEmail}_${widget.alarmId}';
+    String targetUserEmail = _searchResults[index]['email'];
 
-    _firestore.collection('requests').doc(docId).delete();
+    // Request'i sil
+    await _firestore.collection('requests').doc(docId).delete();
+
+    // Alarm Users'dan kullanıcıyı sil
+    final alarmDoc = await _firestore
+        .collection('alarms')
+        .doc("${currentUserEmail}_${widget.alarmId}")
+        .get();
+
+    if (alarmDoc.exists) {
+      List<String> alarmUsers = List<String>.from(alarmDoc['AlarmUsers']);
+      List<int> alarmStates = List<int>.from(alarmDoc['AlarmStates']);
+
+      int userIndex = alarmUsers.indexOf(targetUserEmail);
+      if (userIndex != -1) {
+        alarmUsers.removeAt(userIndex);
+        alarmStates.removeAt(userIndex);
+
+        await _firestore
+            .collection('alarms')
+            .doc("${currentUserEmail}_${widget.alarmId}")
+            .update({
+          'AlarmUsers': alarmUsers,
+          'AlarmStates': alarmStates
+        });
+      }
+    }
+
+    // UI'ı güncelle
     setState(() {
       _searchResults.removeAt(index);
+      _printMatchingRequests(currentUserEmail);
     });
   }
 
@@ -129,22 +161,93 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
   }
 
   Future<void> _printMatchingRequests(String senderEmail) async {
-    String docId = '${senderEmail}_${widget.alarmId}';
+    _searchResults.clear();
 
-    final querySnapshot = await _firestore
+    // 1. Alarm Users'ı kontrol et
+    final alarmDoc = await _firestore
+        .collection('alarms')
+        .doc("${senderEmail}_${widget.alarmId}")
+        .get();
+
+    if (alarmDoc.exists) {
+      List<String> alarmUsers = List<String>.from(alarmDoc['AlarmUsers']);
+      // Mevcut kullanıcı dışındaki kullanıcıları al
+      alarmUsers.where((email) => email != senderEmail).forEach((email) {
+        setState(() {
+          _searchResults.add({
+            'email': email,
+            'accepted': true,
+          });
+        });
+      });
+    }
+
+    // 2. Requests'i kontrol et
+    String docId = '${senderEmail}_${widget.alarmId}';
+    final requestsSnapshot = await _firestore
         .collection('requests')
         .where(FieldPath.documentId, isEqualTo: docId)
         .get();
-    _searchResults.clear();
-    for (var doc in querySnapshot.docs) {
-      setState(() {
-        _searchResults.add(
-          {
-            'email': doc['to'],
-            'accepted': doc['isAccepted'],
-          },
-        );
-      });
+
+    for (var doc in requestsSnapshot.docs) {
+      String userEmail = doc['to'];
+      bool isAccepted = doc['isAccepted'];
+
+      // Eğer kullanıcı zaten _searchResults'ta varsa (alarm users'dan gelmiş) ve
+      // request accepted true ise, atla
+      bool userExists = _searchResults.any((result) =>
+      result['email'] == userEmail && result['accepted']);
+
+      // Kullanıcı listede yoksa veya request accepted false ise ekle
+      if (!userExists && !isAccepted) {
+        setState(() {
+          _searchResults.add({
+            'email': userEmail,
+            'accepted': false,
+          });
+        });
+      }
     }
   }
+
+  void _listenForUpdates() {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    String userEmail = FirebaseAuth.instance.currentUser!.email!;
+
+    // Requests koleksiyonunu dinle
+    firestore
+        .collection('requests')
+        .where('from', isEqualTo: userEmail)
+        .snapshots()
+        .listen((snapshot) {
+      for (var change in snapshot.docChanges) {
+        // Değişiklik bir güncelleme ise
+        if (change.type == DocumentChangeType.modified) {
+          var data = change.doc.data() as Map<String, dynamic>;
+          // Eğer istek kabul edildiyse
+          if (data['isAccepted'] == true) {
+            // Listeyi güncelle
+            _printMatchingRequests(userEmail);
+          }
+        }
+      }
+    });
+
+    // Alarms koleksiyonunu dinle
+    firestore
+        .collection('alarms')
+        .doc("${userEmail}_${widget.alarmId}")
+        .snapshots()
+        .listen((snapshot) {
+      if (snapshot.exists) {
+        _printMatchingRequests(userEmail);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
 }

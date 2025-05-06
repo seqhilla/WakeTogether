@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:waketogether/screens/requests.dart';
+import '../services/notification_service.dart';
 
 import '../data/AlarmItem.dart';
 import '../utils/GeneralUtils.dart';
@@ -27,14 +28,36 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   List<AlarmItem> alarms = [];
   static StreamSubscription<AlarmSettings>? subscription;
+  static StreamSubscription<QuerySnapshot>? alarmStateSubscription;
 
   @override
   void initState() {
     super.initState();
-    //_loadAlarms();
     listenForUpdates();
     subscription ??= Alarm.ringStream.stream.listen(navigateToRingScreen);
     checkAndRequestPermissions();
+    // Bildirim servisini başlat ve callback'i ayarla
+    NotificationService.onNotificationTap = (String? payload) {
+      if (payload == "requests_page") {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const RequestsPage()),
+        );
+      }
+    };
+    NotificationService.initialize();
+    _setupAlarmStateListener();
+
+    // İlk açılışta bildirimden gelip gelmediğini kontrol et
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final payload = NotificationService.checkAndClearPayload();
+      if (payload == "requests_page") {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const RequestsPage()),
+        );
+      }
+    });
   }
 
   void listenForUpdates() {
@@ -51,6 +74,58 @@ class _MyHomePageState extends State<MyHomePage> {
       // If an update is detected, call the _loadAlarms function
       _loadAlarms();
     });
+  }
+
+  void _setupAlarmStateListener() {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    String userEmail = FirebaseAuth.instance.currentUser!.email!;
+
+    // Giden istekler için dinleme
+    firestore
+        .collection('requests')
+        .where('from', isEqualTo: userEmail)
+        .snapshots()
+        .listen((snapshot) {
+      for (var change in snapshot.docChanges) {
+        if (change.type == DocumentChangeType.modified) {
+          var data = change.doc.data() as Map<String, dynamic>;
+          if (data['isAccepted'] == true) {
+            String toEmail = data['to'];
+            GeneralUtils.showToastMessage("$toEmail isteğinizi kabul etti!");
+            NotificationService.showNotification(
+              title: "Harika!",
+              body: "$toEmail alarm isteğinizi kabul etti!",
+            );
+          }
+        }
+      }
+    });
+
+    // Gelen istekler için dinleme
+    firestore
+        .collection('requests')
+        .where('to', isEqualTo: userEmail)
+        .snapshots()
+        .listen((snapshot) {
+      for (var change in snapshot.docChanges) {
+        if (change.type == DocumentChangeType.added) {
+          var data = change.doc.data() as Map<String, dynamic>;
+          if (data['isAccepted'] == false) {
+            String fromEmail = data['from'];
+            _showRequestNotification(fromEmail);
+          }
+        }
+      }
+    });
+  }
+
+  void _showRequestNotification(String fromEmail) {
+    NotificationService.showNotification(
+      title: "Yeni Alarm İsteği",
+      body: "$fromEmail seninle uyanmak istiyor! Kabul etmek için hemen tıkla!",
+      payload: "requests_page", // Bildirime tıklanınca RequestsPage'e yönlendirecek
+    );
+    GeneralUtils.showToastMessage("$fromEmail size alarm isteği gönderdi!");
   }
 
   Future<void> checkAndRequestPermissions() async {
