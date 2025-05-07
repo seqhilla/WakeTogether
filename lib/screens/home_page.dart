@@ -29,11 +29,13 @@ class _MyHomePageState extends State<MyHomePage> {
   List<AlarmItem> alarms = [];
   static StreamSubscription<AlarmSettings>? subscription;
   static StreamSubscription<QuerySnapshot>? alarmStateSubscription;
+  bool hasRequest = false;
 
   @override
   void initState() {
     super.initState();
     listenForUpdates();
+    _requestListener();
     subscription ??= Alarm.ringStream.stream.listen(navigateToRingScreen);
     checkAndRequestPermissions();
     // Bildirim servisini başlat ve callback'i ayarla
@@ -73,6 +75,25 @@ class _MyHomePageState extends State<MyHomePage> {
         .listen((snapshot) {
       // If an update is detected, call the _loadAlarms function
       _loadAlarms();
+    });
+  }
+
+  void _requestListener() {
+    final firestore = FirebaseFirestore.instance;
+    final userEmail = FirebaseAuth.instance.currentUser!.email!;
+
+    firestore
+        .collection('requests')
+        .where('to', isEqualTo: userEmail)
+        .where('isAccepted', isEqualTo: false)
+        .snapshots()
+        .listen((snapshot) {
+      final newHasInvite = snapshot.docs.isNotEmpty;
+      if (newHasInvite != hasRequest) {
+        setState(() {
+          hasRequest = newHasInvite;
+        });
+      }
     });
   }
 
@@ -390,7 +411,14 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.mail),
+            icon: Icon(
+              hasRequest
+                  ? Icons.mark_email_unread
+                  : Icons.mark_email_read,
+              color: hasRequest
+                  ? Colors.red
+                  : null,
+            ),
             onPressed: () {
               Navigator.push(
                 context,
