@@ -208,17 +208,17 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
                   onPressed: () => Navigator.pop(context),
                   child: const Text('İptal'),
                 ),
-                if (!widget.isNew) // Eğer alarm yeni değilse 'Sil' butonunu göster
-                  ElevatedButton(
-                    onPressed: () async {
-                      if (widget.initialAlarm.id != null) {
-                        String userEmail = FirebaseAuth.instance.currentUser!.email!;
+                if (!widget.isNew)
+                  Builder(
+                    builder: (context) {
+                      String currentUserEmail = FirebaseAuth.instance.currentUser!.email!;
+                      bool isOwner = widget.initialAlarm.alarmUsers[0] == currentUserEmail;
 
-                        await _firestore.collection('alarms').doc("${userEmail}_${widget.initialAlarm.id}").delete();
-                      }
-                      Navigator.pop(context, true);
+                      return ElevatedButton(
+                        onPressed: isOwner ? _deleteAlarmAndRequests : _leaveAlarm,
+                        child: Text(isOwner ? 'Sil' : 'Ayrıl'),
+                      );
                     },
-                    child: const Text('Sil'),
                   ),
                 ElevatedButton(
                   onPressed: () {
@@ -348,6 +348,81 @@ class _EditAlarmScreenState extends State<EditAlarmScreen> {
       return 0; // Return 0 if there are no alarms
     } else {
       return alarmsSnapshot.docs.first.data()['id']; // Return the ID of the last alarm
+    }
+  }
+
+  Future<void> _deleteAlarmAndRequests() async {
+    if (widget.initialAlarm.id != null) {
+      try {
+        final batch = _firestore.batch();
+        String userEmail = FirebaseAuth.instance.currentUser!.email!;
+
+        // Alarmı sil
+        final alarmRef = _firestore.collection('alarms')
+            .doc("${userEmail}_${widget.initialAlarm.id}");
+        batch.delete(alarmRef);
+
+        final requestsSnapshot = await _firestore.collection('requests')
+            .where('from', isEqualTo: userEmail)
+            .where('forAlarm', isEqualTo: widget.initialAlarm.id)
+            .get();
+
+        for (var doc in requestsSnapshot.docs) {
+          batch.delete(doc.reference);
+        }
+
+        Navigator.pop(context, true);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Alarm silinirken bir hata oluştu'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _leaveAlarm() async {
+    String currentUserEmail = FirebaseAuth.instance.currentUser!.email!;
+    try {
+      // Alarmın güncel verilerini al
+      DocumentSnapshot alarmDoc = await _firestore
+          .collection('alarms')
+          .doc("${widget.initialAlarm.alarmUsers[0]}_${widget.initialAlarm.id}")
+          .get();
+
+      if (alarmDoc.exists) {
+        Map<String, dynamic> data = alarmDoc.data() as Map<String, dynamic>;
+        List<String> alarmUsers = List<String>.from(data['AlarmUsers']);
+        List<int> alarmStates = List<int>.from(data['AlarmStates']);
+
+        // Kullanıcının indexini bul
+        int userIndex = alarmUsers.indexOf(currentUserEmail);
+        if (userIndex != -1) {
+          // Kullanıcıyı ve durumunu listelerden çıkar
+          alarmUsers.removeAt(userIndex);
+          alarmStates.removeAt(userIndex);
+
+          // Firestore'u güncelle
+          await _firestore
+              .collection('alarms')
+              .doc("${widget.initialAlarm.alarmUsers[0]}_${widget.initialAlarm.id}")
+              .update({
+            'AlarmUsers': alarmUsers,
+            'AlarmStates': alarmStates,
+          });
+
+          Navigator.pop(context, true);
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('İşlem sırasında bir hata oluştu'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 

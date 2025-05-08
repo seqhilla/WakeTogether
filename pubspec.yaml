@@ -33,6 +33,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_local_notifications: ^19.1.0
+  collection: any
   sqflite: any
   path: any
   alarm: ^3.1.4

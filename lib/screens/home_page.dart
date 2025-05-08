@@ -7,8 +7,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:waketogether/screens/requests.dart';
-import '../services/notification_service.dart';
+import 'package:collection/collection.dart';
 
+import '../services/notification_service.dart';
 import '../data/AlarmItem.dart';
 import '../utils/GeneralUtils.dart';
 import '../utils/TimeUtils.dart';
@@ -205,11 +206,16 @@ class _MyHomePageState extends State<MyHomePage> {
       alarms = tempAlarms.reversed.toList();
     });
 
-    for(var alarm in alarms) {
-      if (alarm.isActive) {
-        _scheduleAlarm(alarm, false);
+    var pluginAlarms = Alarm.getAlarms();
+    for (var pluginAlarm in pluginAlarms) {
+      AlarmItem? matchedAlarm = alarms.firstWhereOrNull(
+            (a) => a.id == pluginAlarm.id,
+      );
+
+      if (matchedAlarm != null && matchedAlarm.isActive) {
+        _scheduleAlarm(matchedAlarm, false); // matchedAlarm burada alarms listesindekidir
       } else {
-        _cancelAlarm(alarm.id!);
+        _cancelAlarm(pluginAlarm.id);
       }
     }
   }
